@@ -5,10 +5,10 @@ from PIL import Image
 
 
 def crop(config):
-    path = config.input_path
+    path = config.input
     label_id = config.id
     format = config.format
-    output = config.output_path
+    output = config.output
 
     for image in tqdm(glob.glob(path + "*" + format), desc="Exporting crops"):
         # read image
