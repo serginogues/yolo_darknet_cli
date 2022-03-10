@@ -12,6 +12,7 @@ def count(config):
     count_clases = [0 for _ in range(num_clases)]
     count_images = [0 for _ in range(num_clases)]
 
+    class_labels = []
     for filename in glob.glob(path + '*.txt', recursive=True):
         labels_all = []
         with open(filename, 'r+') as out:
@@ -22,14 +23,16 @@ def count(config):
                     labels_all.append(clase)
                     count_clases[clase] += 1
                 except ValueError:
-                    continue
+                    class_labels.append(line)
         sorted_unique_labels = list(set(labels_all))
         for l in sorted_unique_labels:
             count_images[l] += 1
     print()
-    print("Class - # instances - # images")
     for i in range(num_clases):
-        print(str(i) + " - " + str(count_clases[i]) + " - " + str(count_images[i]))
+        print(class_labels[i].split("\\")[0])
+        print(" - " + str(count_clases[i]) + " instances")
+        print(" - " + str(count_images[i]) + " images")
+        print()
 
 
 if __name__ == '__main__':

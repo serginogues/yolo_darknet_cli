@@ -8,7 +8,7 @@ import numpy as np
 from tqdm import tqdm
 import glob
 from joblib import Parallel, delayed
-from sewar.full_ref import mse, rmse, psnr, uqi, ssim, ergas, scc, rase, sam, msssim, vifp
+from sewar.full_ref import mse, rmse, ergas
 
 output = "output/new_dataset/"
 output_similar = "output/similar_image_pairs/"
@@ -17,6 +17,8 @@ os.makedirs(output_similar, exist_ok=True)  # succeeds even if directory exists.
 
 input = "D:/ImotionAnalytics/Datasets/620_train_all_classes_darknet/train/"
 type = ".jpg"
+SIM_THRESHOLD_TRAIN = [50, 20, 5000]
+SIM_THRESHOLD_OCR = [1000, 100, 40000]  # 50, 20, 5000
 
 
 def main(config):
@@ -26,7 +28,6 @@ def main(config):
 
     image_array = []
     count = 0
-    names = []
     for filename in tqdm(glob.glob(input_path + '*' + type), desc="Comparing images"):
 
         # read image
@@ -37,7 +38,6 @@ def main(config):
         # get name
         img_path = filename.split(type)[0]
         img_name = img_path.split("\\")[-1]
-        names.append(img_name)
 
         # compare with already appended images
         # if similar to any do not append
@@ -56,7 +56,9 @@ def is_similar(a, b) -> bool:
     RMSE = rmse(a, b)
     ERGAS = ergas(a, b)
 
-    if MSE < 50 and RMSE < 20 and ERGAS < 5000:
+    thr = SIM_THRESHOLD_TRAIN
+
+    if MSE < thr[0] and RMSE < thr[1] and ERGAS < thr[2]:
         numpy_horizontal = np.hstack((a, b))
         cv2.imwrite(output_similar + str(np.random.randint(1000000)) + type, numpy_horizontal)
         return True
