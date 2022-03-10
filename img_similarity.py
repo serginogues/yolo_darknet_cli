@@ -15,8 +15,6 @@ output_similar = "output/similar_image_pairs/"
 os.makedirs(output, exist_ok=True)
 os.makedirs(output_similar, exist_ok=True)  # succeeds even if directory exists.
 
-input = "D:/ImotionAnalytics/Datasets/620_train_all_classes_darknet/train/"
-type = ".jpg"
 SIM_THRESHOLD_TRAIN = [50, 20, 5000]
 SIM_THRESHOLD_OCR = [1000, 100, 40000]  # 50, 20, 5000
 
