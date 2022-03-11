@@ -9,6 +9,7 @@ from tqdm import tqdm
 import glob
 from joblib import Parallel, delayed
 from sewar.full_ref import mse, rmse, ergas
+import shutil
 
 output = "output/new_dataset/"
 output_similar = "output/similar_image_pairs/"
@@ -17,6 +18,7 @@ os.makedirs(output_similar, exist_ok=True)  # succeeds even if directory exists.
 
 SIM_THRESHOLD_TRAIN = [50, 20, 5000]
 SIM_THRESHOLD_OCR = [1000, 100, 40000]  # 50, 20, 5000
+SIM_THRESHOLD_WHEELCHAIR = [8000, 800, 220000]
 
 
 def main(config):
@@ -43,6 +45,7 @@ def main(config):
         if not any(result):
             image_array.append(img)
             cv2.imwrite(output + img_name + type, img0)
+            shutil.copyfile(img_path + ".txt", output + img_name + ".txt")
         count += 1
 
     print("Original dataset size: " + str(count))
@@ -58,7 +61,7 @@ def is_similar(a, b) -> bool:
 
     if MSE < thr[0] and RMSE < thr[1] and ERGAS < thr[2]:
         numpy_horizontal = np.hstack((a, b))
-        cv2.imwrite(output_similar + str(np.random.randint(1000000)) + type, numpy_horizontal)
+        cv2.imwrite(output_similar + str(np.random.randint(1000000)) + ".jpg", numpy_horizontal)
         return True
     else:
         return False
