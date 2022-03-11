@@ -39,7 +39,7 @@ def crop(config):
         # 4-tuple (left, upper),(right, lower)
         for c, box in enumerate(labels):
             im_crop = im.crop(box)
-            im_crop.save(output + im_name + "_" + str(c) + ".jpeg", "JPEG")
+            im_crop.save(output + im_name + "_" + str(c) + format, format.split(".")[1])
 
     print("Cropped images exported at ", output)
 
