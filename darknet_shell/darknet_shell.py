@@ -6,8 +6,6 @@ MODELS = ["Andenes", "Tornos"]
 AUTO_LABEL_CMD_INIT = "darknet.exe detector test data\obj.data "
 AUTO_LABEL_CMD_END = " -thresh 0.25 -dont_show -save_labels < data/train.txt"
 
-DATASETS_PATH = "data/datasets/"
-
 
 def auto_label_main(model_key):
     """
@@ -34,17 +32,7 @@ def auto_label_main(model_key):
     weights_path = get_weights(keyword)
 
     # dataset path
-    found_dataset = False
-    dataset_path = ""
-    while not found_dataset:
-        dataset_path = choose_directory(DATASETS_PATH)
-        has_train_and_valid = dataset_has_train_valid_subfolders(dataset_path)
-        if has_train_and_valid:
-            clear = lambda: os.system('cls')
-            clear()
-            print("Chosen dataset contains train and valid subfolders. Please choose a folder containing all images to be labeled")
-        else:
-            found_dataset = True
+    dataset_path = get_dataset(False)
 
     # update train.txt and copy images to obj/
     list_images(dataset_path)

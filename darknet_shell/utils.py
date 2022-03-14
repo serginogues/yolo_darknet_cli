@@ -8,8 +8,26 @@ def get_file_name_from_path(path):
     return path.split("\\")[-1]
 
 
+def get_dataset(is_train_and_valid = True) -> str:
+    DATASETS_PATH = "data/datasets/"
+    print("############### getting dataset path")
+    found_dataset = False
+    dataset_path = ""
+    while not found_dataset:
+        dataset_path = choose_directory(DATASETS_PATH)
+        has_train_and_valid = dataset_has_train_valid_subfolders(dataset_path)
+        if has_train_and_valid != is_train_and_valid:
+            print()
+            print("valid/ and train/ not found (for TRAINING and VALIDATION) "
+                  "OR valid/ and train/ found but not needed (AUTO-LABEL)")
+        else:
+            found_dataset = True
+    return dataset_path
+
+
 def get_weights(model: str = "turnstiles"):
     print()
+    print("############### getting weights path")
     path = "backup/custom_models/"
     list_weights = []
 
@@ -23,11 +41,14 @@ def get_weights(model: str = "turnstiles"):
             print("   " + str(count) + " - " + cfg_name)
             count += 1
 
-    return list_weights[ask_user_option(list_weights, print_options=False)]
+    final_path = list_weights[ask_user_option(list_weights, print_options=False)]
+    print("############### .weights PATH = " + final_path)
+    return final_path
 
 
 def get_cfg(model: str = "turnstiles"):
     print()
+    print("############### getting cfg file path")
     path = "cfg/custom_models/"
     num_classes = 0
     list_cfg = []
@@ -49,7 +70,11 @@ def get_cfg(model: str = "turnstiles"):
             print("   " + str(count) + " - " + cfg_name + " (" + str(num_classes) + " classes)")
             count += 1
 
-    return list_cfg[ask_user_option([x for x,y in list_cfg], print_options=False)]
+    cfg_path, num_classes = list_cfg[ask_user_option([x for x,y in list_cfg], print_options=False)]
+    print("############### .cfg PATH = " + cfg_path)
+    print("############### Nº CLASSES = " + str(num_classes))
+
+    return cfg_path, num_classes
 
 
 def ask_user_option(params: list, print_options: bool = True) -> int:
