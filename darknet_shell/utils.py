@@ -1,4 +1,11 @@
-from config import *
+import glob
+import os
+import shutil
+from random import randint
+
+
+def get_file_name_from_path(path):
+    return path.split("\\")[-1]
 
 
 def get_weights(model: str = "turnstiles"):
@@ -11,7 +18,7 @@ def get_weights(model: str = "turnstiles"):
     for filename in glob.glob(path + '*.weights', recursive=True):
         count = 0
         if model in filename:
-            cfg_name = filename.split("\\")[-1]
+            cfg_name = get_file_name_from_path(filename)
             list_weights.append(filename)
             print("   " + str(count) + " - " + cfg_name)
             count += 1
@@ -37,7 +44,7 @@ def get_cfg(model: str = "turnstiles"):
                     if "classes" in line:
                         num_classes = int(line.split("=")[1])
                         break
-            cfg_name = filename.split("\\")[-1]
+            cfg_name = get_file_name_from_path(filename)
             list_cfg.append((filename, num_classes))
             print("   " + str(count) + " - " + cfg_name + " (" + str(num_classes) + " classes)")
             count += 1
@@ -70,17 +77,84 @@ def ask_user_path() -> str:
             continue
 
 
-def list_images(is_train: bool = True):
-    file = "train" if is_train else "valid"
-    with open('data/' + file + '.txt', 'w') as out:
-        for img in [f for f in os.listdir('C:/darknet-master/data/' + file) if
-                    not (f.endswith('.txt') or f.endswith('.labels'))]:
-            out.write('C:/darknet-master/data/valid/' + img + '\n')
+def list_images(path_from: str, is_train: bool = True):
+    """
+    Creates obj or valid folders, copies files from dataset and writes train.txt or valid.txt
+    :param path_from: path to dataset where images are stored
+    :param is_train: if True, creates obj/ and writes in train.txt, else valid/ and valid.txt
+    """
+
+    clear = lambda: os.system('cls')
+    clear()
+
+    folder_to = "train" if is_train else "valid"
+    path_to = 'data/obj/' if is_train else 'data/valid/'
+
+    # create obj or valid
+    try:
+        if os.path.exists(path_to):
+            shutil.rmtree(path_to)
+        os.makedirs(path_to)
+    except OSError:
+        print("Creation of the directory %s failed" % path_to)
+
+    # write in train.txt or valid.txt and copy images
+    try:
+        with open('data/' + folder_to + '.txt', 'w') as out:
+            for img in [f for f in os.listdir(path_from + '/') if (f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg'))]:
+                out.write(path_to + img + '\n')
+                shutil.copyfile(path_from + "/" + img, path_to + img)
+    except OSError:
+        print("Error while copying images from %s", path_from)
 
 
-def choose_directory():
+def choose_directory(path: str) -> str:
     """
     List available folders and return chosen by user
     """
     print("List of available folders:")
-    pass
+    list_subfolders = [f.path for f in os.scandir(path) if f.is_dir()]
+    folder_path = list_subfolders[ask_user_option([get_file_name_from_path(x) for x in list_subfolders])]
+    return folder_path
+
+
+def dataset_has_train_valid_subfolders(path: str) -> bool:
+    """
+    :param path: path to dataset
+    :return: True if repo contains 'train' and 'valid' folders
+    """
+    list_subfolders = [f.name for f in os.scandir(path) if f.is_dir()]
+    has_train = False
+    has_valid = False
+    for path in list_subfolders:
+        if 'train' in path:
+            has_train = True
+        elif 'valid' in path:
+            has_valid = True
+
+    return has_train and has_valid
+
+
+def update_obj_data(num_classes: int):
+    backup_path = "C:/darknet-master/backup/new_training_" + str(randint(0, 1000000))
+    text = "classes = " + str(num_classes) + "\n" + "train = data/train.txt\n" \
+           + "valid = data/valid.txt\n" + "names = data/obj.names\n" \
+            + "backup = " + backup_path
+
+    try:
+        if os.path.exists(backup_path):
+            shutil.rmtree(backup_path)
+        os.makedirs(backup_path)
+    except OSError:
+        print("Creation of the directory %s failed" % backup_path)
+    else:
+        print("Backup path: \n" + backup_path)
+
+    with open('data/obj.data', 'r+') as myfile:
+        data = myfile.read()
+        myfile.seek(0)
+        myfile.write(text)
+        myfile.truncate()
+
+    print("data/obj.data updated with following: \n")
+    print(text)
