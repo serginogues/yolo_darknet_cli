@@ -3,13 +3,90 @@ import os
 import shutil
 from random import randint
 
+OPTIONS = ["Auto Labeling", "Test model on Video", "Test model on Image"]
+MODELS = ["Andenes", "Tornos"]
+
+AUTO_LABEL_CMD_INIT = "darknet.exe detector test data\obj.data "
+AUTO_LABEL_CMD_END = " -thresh 0.25 -dont_show -save_labels < data/train.txt"
+
+
+def auto_label_main(keyword):
+    """
+    Example:
+    darknet.exe detector test data\obj.data
+    cfg\custom-yolov4_496_train_all_classes.cfg
+    backup\train\yolov4\train_all_classes\496_train_all_classes\custom-yolov4_496_train_all_classes_final.weights
+    -thresh 0.25 -dont_show -save_labels < data/train.txt
+    """
+
+    print("############# AUTO-LABEL: " + keyword.upper() + " #############")
+
+    # get cfg file path
+    cfg_path, num_classes = get_cfg(keyword)
+
+    # get backup path
+    weights_path = get_weights(keyword)
+
+    # dataset path
+    dataset_path = get_dataset(False)
+
+    # update train.txt and copy images to obj/
+    list_images(dataset_path, copy_labels=False)
+
+    # update obj.data
+    update_obj_data(num_classes)
+
+    # update obj.names
+    print()
+    print("You have " + str(num_classes)
+          + " classes. Please update data/obj.names with correct labels (one label per line). Enter '0' once done.")
+    ask_user_option(['Continue'])
+
+    # execute command
+    full_cmd = AUTO_LABEL_CMD_INIT + cfg_path + " " + weights_path + AUTO_LABEL_CMD_END
+
+    clear = lambda: os.system('cls')
+    clear()
+    print("The following command will be executed. If it is correct enter '0' to begin auto-label:")
+    print()
+    print(full_cmd)
+    ask_user_option(['Continue'])
+
+    os.system(full_cmd)
+
+
+def pick_model() -> str:
+    model_key = MODELS[ask_user_option(MODELS)]
+    keyword = "train"
+    if ('andenes' or 'train') in model_key.lower():
+        keyword = "train"
+    elif ('torno' or 'turnstile') in model_key.lower():
+        keyword = "turnstiles"
+
+    return keyword
+
+
+def main():
+    print("Welcome to Darknet Shell :')")
+    action_key = OPTIONS[ask_user_option(OPTIONS)]
+    keyword = pick_model()
+    clear = lambda: os.system('cls')
+    clear()
+
+    if 'auto' and 'label' in action_key.lower():
+        auto_label_main(keyword)
+    elif 'test' and 'video' in action_key.lower():
+        pass
+    elif 'test' and 'image' in action_key.lower():
+        pass
+
 
 def get_file_name_from_path(path):
     return path.split("\\")[-1]
 
 
 def get_dataset(is_train_and_valid = True) -> str:
-    DATASETS_PATH = "data/datasets/"
+    DATASETS_PATH = "darknet_shell/data/datasets/"
     found_dataset = False
     dataset_path = ""
     while not found_dataset:
@@ -28,7 +105,7 @@ def get_dataset(is_train_and_valid = True) -> str:
 
 
 def get_weights(model: str = "turnstiles"):
-    path = "backup/custom_models/"
+    path = "darknet_shell/backup/custom_models/"
     list_weights = []
 
     print("List of all available .weight filess:")
@@ -48,7 +125,7 @@ def get_weights(model: str = "turnstiles"):
 
 
 def get_cfg(model: str = "turnstiles"):
-    path = "cfg/custom_models/"
+    path = "darknet_shell/cfg/custom_models/"
     num_classes = 0
     list_cfg = []
 
@@ -126,7 +203,7 @@ def list_images(path_from: str, is_train: bool = True, copy_labels: bool = True)
     # write in train.txt or valid.txt and copy images
     try:
 
-        with open(os.path.join('data', folder_to + '.txt'), 'w') as out:
+        with open(os.path.join('darknet_shell/data', folder_to + '.txt'), 'w') as out:
             for img in [f for f in os.listdir(path_from + '\\') if (f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg'))]:
                 out.write(path_to + img + '\n')  # write in txt
                 shutil.copyfile(path_from + "\\" + img, path_to + img)  # copy images
@@ -185,7 +262,7 @@ def update_obj_data(num_classes: int, create_backup: bool = False):
         except OSError:
             print("Creation of the directory %s failed" % backup_path)
 
-    with open('data/obj.data', 'r+') as myfile:
+    with open('darknet_shell/data/obj.data', 'r+') as myfile:
         data = myfile.read()
         myfile.seek(0)
         myfile.write(text)
@@ -194,3 +271,8 @@ def update_obj_data(num_classes: int, create_backup: bool = False):
     print("############### data/obj.data updated with following: \n")
     print(text)
     print()
+
+
+if __name__ == '__main__':
+    main()
+
