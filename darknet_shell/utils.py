@@ -10,7 +10,6 @@ def get_file_name_from_path(path):
 
 def get_dataset(is_train_and_valid = True) -> str:
     DATASETS_PATH = "data/datasets/"
-    print("############### getting dataset path")
     found_dataset = False
     dataset_path = ""
     while not found_dataset:
@@ -22,12 +21,13 @@ def get_dataset(is_train_and_valid = True) -> str:
                   "OR valid/ and train/ found but not needed (AUTO-LABEL)")
         else:
             found_dataset = True
+
+    print("############### dataset PATH = " + dataset_path)
+    print()
     return dataset_path
 
 
 def get_weights(model: str = "turnstiles"):
-    print()
-    print("############### getting weights path")
     path = "backup/custom_models/"
     list_weights = []
 
@@ -43,12 +43,11 @@ def get_weights(model: str = "turnstiles"):
 
     final_path = list_weights[ask_user_option(list_weights, print_options=False)]
     print("############### .weights PATH = " + final_path)
+    print()
     return final_path
 
 
 def get_cfg(model: str = "turnstiles"):
-    print()
-    print("############### getting cfg file path")
     path = "cfg/custom_models/"
     num_classes = 0
     list_cfg = []
@@ -73,6 +72,7 @@ def get_cfg(model: str = "turnstiles"):
     cfg_path, num_classes = list_cfg[ask_user_option([x for x,y in list_cfg], print_options=False)]
     print("############### .cfg PATH = " + cfg_path)
     print("############### Nº CLASSES = " + str(num_classes))
+    print()
 
     return cfg_path, num_classes
 
@@ -86,7 +86,7 @@ def ask_user_option(params: list, print_options: bool = True) -> int:
         try:
             action = int(input("Choose an option (write option number):"))
             if 0 <= action < len(params):
-                print("Chosen option: " + params[action])
+                print()
                 return action
         except ValueError:
             continue
@@ -102,41 +102,51 @@ def ask_user_path() -> str:
             continue
 
 
-def list_images(path_from: str, is_train: bool = True):
+def list_images(path_from: str, is_train: bool = True, copy_labels: bool = True):
     """
     Creates obj or valid folders, copies files from dataset and writes train.txt or valid.txt
     :param path_from: path to dataset where images are stored
     :param is_train: if True, creates obj/ and writes in train.txt, else valid/ and valid.txt
     """
 
-    clear = lambda: os.system('cls')
-    clear()
-
     folder_to = "train" if is_train else "valid"
-    path_to = 'data/obj/' if is_train else 'data/valid/'
+    path_to = 'data\\obj\\' if is_train else 'data\\valid\\'
 
-    # create obj or valid
     try:
+        # create obj or valid
         if os.path.exists(path_to):
             shutil.rmtree(path_to)
         os.makedirs(path_to)
     except OSError:
         print("Creation of the directory %s failed" % path_to)
+    else:
+        print("############### %s created", path_to)
+        print()
 
     # write in train.txt or valid.txt and copy images
     try:
-        with open('data/' + folder_to + '.txt', 'w') as out:
-            for img in [f for f in os.listdir(path_from + '/') if (f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg'))]:
-                out.write(path_to + img + '\n')
-                shutil.copyfile(path_from + "/" + img, path_to + img)
+
+        with open(os.path.join('data', folder_to + '.txt'), 'w') as out:
+            for img in [f for f in os.listdir(path_from + '\\') if (f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg'))]:
+                out.write(path_to + img + '\n')  # write in txt
+                shutil.copyfile(path_from + "\\" + img, path_to + img)  # copy images
+
+                if copy_labels:
+                    img_name = get_file_name_from_path(img)
+                    shutil.copyfile(path_from + "\\" + img_name + ".txt", path_to + img_name + ".txt")  # copy txt labels
     except OSError:
-        print("Error while copying images from %s", path_from)
+        print("Error while copying images from (list_images()) %s", path_from)
+    else:
+        print("############### %s.txt written", folder_to)
+        print("############### images added to %s.txt written", folder_to)
+        print()
 
 
 def choose_directory(path: str) -> str:
     """
     List available folders and return chosen by user
     """
+    print()
     print("List of available folders:")
     list_subfolders = [f.path for f in os.scandir(path) if f.is_dir()]
     folder_path = list_subfolders[ask_user_option([get_file_name_from_path(x) for x in list_subfolders])]
@@ -160,20 +170,20 @@ def dataset_has_train_valid_subfolders(path: str) -> bool:
     return has_train and has_valid
 
 
-def update_obj_data(num_classes: int):
+def update_obj_data(num_classes: int, create_backup: bool = False):
+    print()
     backup_path = "C:/darknet-master/backup/new_training_" + str(randint(0, 1000000))
     text = "classes = " + str(num_classes) + "\n" + "train = data/train.txt\n" \
            + "valid = data/valid.txt\n" + "names = data/obj.names\n" \
             + "backup = " + backup_path
 
-    try:
-        if os.path.exists(backup_path):
-            shutil.rmtree(backup_path)
-        os.makedirs(backup_path)
-    except OSError:
-        print("Creation of the directory %s failed" % backup_path)
-    else:
-        print("Backup path: \n" + backup_path)
+    if create_backup:
+        try:
+            if os.path.exists(backup_path):
+                shutil.rmtree(backup_path)
+            os.makedirs(backup_path)
+        except OSError:
+            print("Creation of the directory %s failed" % backup_path)
 
     with open('data/obj.data', 'r+') as myfile:
         data = myfile.read()
@@ -181,5 +191,6 @@ def update_obj_data(num_classes: int):
         myfile.write(text)
         myfile.truncate()
 
-    print("data/obj.data updated with following: \n")
+    print("############### data/obj.data updated with following: \n")
     print(text)
+    print()
