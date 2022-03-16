@@ -172,7 +172,7 @@ def count_labels():
 
     total_images = 0
     total_instances = 0
-    for filename in tqdm(glob.glob(path + '*.txt', recursive=True), desc="Finding images and exporting for "):
+    for filename in tqdm(glob.glob(path + '*.txt', recursive=True), desc="Counting images"):
         labels_all = []
         total_images += 1
         with open(filename, 'r+') as out:
@@ -226,15 +226,17 @@ def export_image_with_given_label():
     print("Enter desired class id to crop images")
     label_id = ask_user_option(classes, return_idx=True)
     print("Provide output path (it will be created if it does not exist)")
+    print("remember to write path with '\' at the end")
     output = ask_user_path()
-    output_contains = output + "\\contains_" + classes[label_id] + "\\"
-    output_not_contains = output + "\\not_contains_" + classes[label_id] + "\\"
+    output_contains = output + "contains_" + classes[label_id] + "\\"
+    output_not_contains = output + "not_contains_" + classes[label_id] + "\\"
 
     try:
         # create obj or valid
         if os.path.exists(output_contains):
             shutil.rmtree(output_contains)
-        os.makedirs(output)
+        else:
+            os.makedirs(output_contains)
     except ValueError:
         pass
 
@@ -242,7 +244,8 @@ def export_image_with_given_label():
         # create obj or valid
         if os.path.exists(output_not_contains):
             shutil.rmtree(output_not_contains)
-        os.makedirs(output_not_contains)
+        else:
+            os.makedirs(output_not_contains)
     except ValueError:
         pass
 
