@@ -4,7 +4,7 @@ import shutil
 from random import randint
 
 OPTIONS = ["Auto Labeling", "Test model on Video", "Test model on Image"]
-MODELS = ["Andenes", "Tornos"]
+MODELS = ["Andenes", "Tornos", "OCR"]
 
 AUTO_LABEL_CMD_INIT = "darknet.exe detector test data\obj.data "
 AUTO_LABEL_CMD_END = " -thresh 0.25 -dont_show -save_labels < data/train.txt"
@@ -58,10 +58,12 @@ def auto_label_main(keyword):
 def pick_model() -> str:
     model_key = MODELS[ask_user_option(MODELS)]
     keyword = "train"
-    if ('andenes' or 'train') in model_key.lower():
+    if model_key == MODELS[0]:
         keyword = "train"
-    elif ('torno' or 'turnstile') in model_key.lower():
+    elif model_key == MODELS[1]:
         keyword = "turnstiles"
+    elif model_key == MODELS[2]:
+        keyword = "ocr"
 
     return keyword
 
