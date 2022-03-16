@@ -1,6 +1,3 @@
-"""
-Scan similar images in a Dataset which you might want to remove
-"""
 import argparse
 import os
 import cv2
@@ -21,7 +18,10 @@ SIM_THRESHOLD_OCR = [1000, 100, 40000]  # 50, 20, 5000
 SIM_THRESHOLD_WHEELCHAIR = [8000, 800, 220000]
 
 
-def main(config):
+def img_similarity():
+    """
+    Scan similar images in a Dataset which you might want to remove
+    """
     input_path = config.input
     type = config.format
     NJOBS = config.jobs
@@ -80,4 +80,4 @@ if __name__ == '__main__':
     parser.add_argument('--jobs', type=int, default=12,
                         help='Processor Jobs')
     config = parser.parse_args()
-    main(config)
+    img_similarity(config)
