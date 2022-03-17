@@ -205,14 +205,18 @@ def export_image_with_given_label():
     print("Provide path to folder with images and labels")
     path = ask_user_path()
 
+    if path[-1] != '\\':
+        path = path + "\\"
+
     classes, num_classes = get_classes(path)
     print("Enter desired class id to crop images")
     label_id = ask_user_option(classes, return_idx=True)
     print("Provide output path (it will be created if it does not exist)")
-    print("remember to write path with '\' at the end")
     output = ask_user_path()
-    output_contains = output + "contains_" + classes[label_id] + "\\"
-    output_not_contains = output + "not_contains_" + classes[label_id] + "\\"
+    if output[-1] != '\\':
+        output = output + "\\"
+    output_contains = output + "contains_" + str(label_id) + "\\"
+    output_not_contains = output + "not_contains_" + str(label_id) + "\\"
 
     try:
         # create obj or valid
@@ -221,7 +225,7 @@ def export_image_with_given_label():
         else:
             os.makedirs(output_contains)
     except ValueError:
-        pass
+        print("Could not create directory")
 
     try:
         # create obj or valid
@@ -230,7 +234,7 @@ def export_image_with_given_label():
         else:
             os.makedirs(output_not_contains)
     except ValueError:
-        pass
+        print("Could not create directory")
 
     def export_by_type(path: str, format: str):
         for image in tqdm(glob.glob(path + "*" + format), desc="Finding images and exporting for " + format):
@@ -251,9 +255,11 @@ def export_image_with_given_label():
 
             # save image if contains label
             if contains:
-                im.save(output_contains + im_name + format, format.split(".")[-1])
+                im.save(output_contains + im_name + format)
+                shutil.copyfile(img_path + ".txt", output_contains + im_name + ".txt")
             else:
-                im.save(output_not_contains + im_name + format, format.split(".")[-1])
+                im.save(output_not_contains + im_name + format)
+                shutil.copyfile(img_path + ".txt", output_not_contains + im_name + ".txt")
 
     for f in IMG_FORMAT_LIST:
         export_by_type(path, f)
