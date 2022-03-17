@@ -4,7 +4,7 @@
 YOLO Darknet GUI for automated YOLOv4 model management.
 
 ```
-pip install -r /path/to/requirements.txt
+pip install -r requirements.txt
 ```
 
 
