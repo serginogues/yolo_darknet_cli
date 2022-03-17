@@ -8,13 +8,13 @@ import shutil
 from random import randint
 from tqdm import tqdm
 
-OPTIONS_LIST = ["Auto-label images with trained model",
+OPTIONS_LIST = ["Auto-label images with trained model (DONE)",
                 "Test a trained model",
                 "Train a new model",
-                "Crop and export Yolo labels",
-                "Count label instances and images in Dataset",
+                "Crop and export Yolo labels (DONE)",
+                "Count label instances and images in Dataset (DONE)",
                 "Image similarity in a Dataset",
-                "Export images containing specific object"]
+                "Export images containing specific object (DONE)"]
 
 MODELS_LIST = ["Andenes", "Tornos", "OCR"]
 

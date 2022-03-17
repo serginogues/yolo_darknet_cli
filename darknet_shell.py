@@ -89,14 +89,19 @@ def crop():
 
     print("Provide path to folder with images and labels")
     path = ask_user_path()
+    if path[-1] != '\\':
+        path = path + "\\"
+
     classes, num_classes = get_classes(path)
     print("Enter desired class id to crop images:")
     label_id = ask_user_option(classes, return_idx=True)
     print("Provide output path:")
     output = ask_user_path()
+    if output[-1] != '\\':
+        output = output + "\\"
 
     def crop_by_format(path: str, format: str):
-        for image in tqdm(glob.glob(path + format), desc="Exporting crops for " + format):
+        for image in tqdm(glob.glob(path + "*" + format), desc="Exporting crops for " + format):
             # read image
             im = Image.open(image)
             im_w = im.width
@@ -125,7 +130,7 @@ def crop():
             # 4-tuple (left, upper),(right, lower)
             for c, box in enumerate(labels):
                 im_crop = im.crop(box)
-                im_crop.save(output + im_name + "_" + str(c) + format, format.split(".")[1])
+                im_crop.save(output + im_name + "_" + str(c) + format)
 
     for f in IMG_FORMAT_LIST:
         crop_by_format(path, f)
