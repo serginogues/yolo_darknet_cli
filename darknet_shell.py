@@ -66,9 +66,10 @@ def auto_label_main():
     # execute command
     full_cmd = DARKNET_EXE_PATH + "detector test " + OBJ_DATA_FILE_PATH + " " + cfg_path + " " + weights_path + AUTO_LABEL_CMD_END
 
-    print("The following command will be executed. Enter '0' to begin auto-labeling.")
+    print("Execute the following command at " + BASE_PATH)
     print()
     print(full_cmd)
+    os.chdir(BASE_PATH)
     ask_user_option(['Start'])
     os.system(full_cmd)
 
