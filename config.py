@@ -7,13 +7,18 @@ import os
 import shutil
 from random import randint
 from tqdm import tqdm
+import cv2
+import numpy as np
+from joblib import Parallel, delayed
+from sewar.full_ref import mse, rmse, ergas
+import multiprocessing
 
 OPTIONS_LIST = ["Auto-label images with trained model (DONE)",
                 "Test a trained model",
                 "Train a new model",
                 "Crop and export Yolo labels (DONE)",
                 "Count label instances and images in Dataset (DONE)",
-                "Image similarity in a Dataset",
+                "Image similarity in a Dataset (DONE)",
                 "Export images containing specific object (DONE)"]
 
 MODELS_LIST = ["Andenes", "Tornos", "OCR"]

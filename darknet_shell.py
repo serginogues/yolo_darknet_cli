@@ -27,7 +27,7 @@ def main():
         count_labels()
     elif action_key == OPTIONS_LIST[5]:
         # img similarity
-        pass
+        img_similarity()
     elif action_key == OPTIONS_LIST[6]:
         # export by class
         export_image_with_given_label()
@@ -269,6 +269,93 @@ def export_image_with_given_label():
     for f in IMG_FORMAT_LIST:
         export_by_type(path, f)
     print("Images exported at ", output)
+
+
+def img_similarity():
+    """
+    parser.add_argument('--input', type=str, default="input/",
+                        help='path to folder with imgs and labels')
+    parser.add_argument('--format', type=str, default=".jpg",
+                        help='Image type: .png, .jpg')
+    parser.add_argument('--jobs', type=int, default=12,
+                        help='Processor Jobs')
+    Scan similar images in a Dataset which you might want to remove
+    """
+    SIM_THRESHOLD_TRAIN = [50, 20, 5000]
+    SIM_THRESHOLD_OCR = [1000, 100, 40000]  # 50, 20, 5000
+    SIM_THRESHOLD_WHEELCHAIR = [8000, 800, 220000]
+    THRESHOLD = [SIM_THRESHOLD_TRAIN, SIM_THRESHOLD_OCR, SIM_THRESHOLD_WHEELCHAIR]
+
+    print("Provide path to folder with images and labels")
+    input_path = ask_user_path()
+    if input_path[-1] != '\\':
+        input_path = input_path + "\\"
+
+    new_shell_section(" ")
+
+    output = input_path + "new_dataset/"
+    output_similar = input_path + "similar_image_pairs/"
+    os.makedirs(output, exist_ok=True)
+    os.makedirs(output_similar, exist_ok=True)  # succeeds even if directory exists.
+    print("Created ", output)
+    print("Created ", output_similar)
+
+    NJOBS = multiprocessing.Pool()._processes
+    print("Found " + str(NJOBS) + " workers available in current pool.")
+
+    print("Does your dataset contain labels (.txt files for each image)?")
+    COPY_TXT = True if ask_user_option(['Yes', 'No'], return_idx=True) == 0 else False
+
+    print("What similarity threshold would you like to use?")
+    idx = ask_user_option(['ANDENES', 'OCR', 'WHEELCHAIR', 'Provide my own values'], return_idx=True)
+    if idx < len(THRESHOLD):
+        thr = THRESHOLD[idx]
+    else:
+        aa = int(input("MSE Threshold (write integer): "))
+        bb = int(input("RMSE Threshold (write integer): "))
+        cc = int(input("ERGAS Threshold (write integer): "))
+        thr = [aa, bb, cc]
+
+    def is_similar(a, b) -> bool:
+        MSE = mse(a, b)
+        RMSE = rmse(a, b)
+        ERGAS = ergas(a, b)
+
+        if MSE < thr[0] and RMSE < thr[1] and ERGAS < thr[2]:
+            numpy_horizontal = np.hstack((a, b))
+            cv2.imwrite(output_similar + str(np.random.randint(1000000)) + ".jpg", numpy_horizontal)
+            return True
+        else:
+            return False
+
+    def compare_Parallel(img, image_array, NJOBS):
+        return Parallel(n_jobs=NJOBS)(delayed(is_similar)(img, imm) for idx, imm in enumerate(image_array[-20:]))
+
+    image_array = []
+
+    def run_by_type(type: str):
+        for filename in tqdm(glob.glob(input_path + '*' + type), desc="Comparing images"):
+            # read image
+            img0 = cv2.imread(filename)
+            img = cv2.cvtColor(img0, cv2.COLOR_BGR2RGB)
+            img = cv2.resize(img, (224, 224))
+
+            # get name
+            img_path = filename.split(type)[0]
+            img_name = img_path.split("\\")[-1]
+
+            # compare with already appended images
+            # if similar to any do not append
+            result = compare_Parallel(img, image_array, NJOBS)
+            if not any(result):
+                image_array.append(img)
+                cv2.imwrite(output + img_name + type, img0)
+                if COPY_TXT:
+                    shutil.copyfile(img_path + ".txt", output + img_name + ".txt")
+
+    for f in IMG_FORMAT_LIST:
+        run_by_type(f)
+    print("New dataset size: " + str(len(image_array)))
 
 
 if __name__ == '__main__':
