@@ -81,7 +81,7 @@ def crop():
     parser.add_argument('--output', type=str, default="output/",
                         help='path to folder with imgs and labels')
     parser.add_argument('--id', type=int, default=4,
-                        help='Id of the class from which to extract the crops per image. Default 4 (license_plate)')
+                        help='Id of the class from which to extract the crops per image.')
     parser.add_argument('--format', type=str, default=".jpg",
                         help='Image type: .png, .jpg')
     """
