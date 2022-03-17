@@ -149,11 +149,10 @@ def count_labels():
     if path[-1] != '\\':
         path = path + "\\"
 
-    classes = get_classes(path)
-    num_clases = len(classes)
+    classes, num_classes = get_classes(path)
 
-    count_instances = [0 for _ in range(num_clases)]
-    count_images = [0 for _ in range(num_clases)]
+    count_instances = [0 for _ in range(num_classes)]
+    count_images = [0 for _ in range(num_classes)]
 
     total_images = 0
     total_instances = 0
@@ -174,7 +173,7 @@ def count_labels():
         for l in sorted_unique_labels:
             count_images[l] += 1
     print(" class id - # instances - # images")
-    for i in range(num_clases):
+    for i in range(num_classes):
         print(classes[i] + " - " + str(count_instances[i]) + " - " + str(count_images[i]))
 
     if PLOT:
