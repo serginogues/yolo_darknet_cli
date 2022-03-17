@@ -6,6 +6,7 @@ import glob
 import os
 import shutil
 from random import randint
+from tqdm import tqdm
 
 OPTIONS_LIST = ["Auto-label images with trained model",
                 "Test a trained model",
@@ -22,9 +23,10 @@ AUTO_LABEL_CMD_END = " -thresh 0.25 -dont_show -save_labels < data/train.txt"
 
 BASE_PATH = "C:\\darknet-master"
 DATA_PATH = os.path.join(BASE_PATH, 'data')
+DATA_OBJ_PATH = os.path.join(DATA_PATH, 'obj')
+DATA_VALID_PATH = os.path.join(DATA_PATH, 'valid')
 DATASETS_PATH = os.path.join(DATA_PATH, 'datasets')
 CFG_PATH = os.path.join(BASE_PATH, 'cfg')
-CFG_CUSTOM_PATH = os.path.join(CFG_PATH, 'custom_models')
 BACKUP_PATH = os.path.join(BASE_PATH, 'backup')
 
 IMG_FORMAT_LIST = ['.jpg', '.jpeg', '.png']

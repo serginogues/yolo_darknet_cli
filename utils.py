@@ -5,11 +5,11 @@ Generic small blocks that can be re-used
 from config import *
 
 
-def get_file_name_from_path(path):
+def get_file_name_from_path(path, element: int = 1):
     """
     Given a full path to a file, returns the name of that file including format (i.e. 'name_of_file.txt')
     """
-    return path.split("\\")[-1]
+    return path.split("\\")[-element]
 
 
 def ask_user_option(params: list, print_options: bool = True, return_idx: bool = False) -> int:
@@ -44,7 +44,7 @@ def choose_directory(path: str) -> str:
     :return: path to chosen sub-folder
     """
     list_subfolders = [f.path for f in os.scandir(path) if f.is_dir()]
-    folder_path = ask_user_option([get_file_name_from_path(x) for x in list_subfolders])
+    folder_path = ask_user_option(list_subfolders)
     return folder_path
 
 
@@ -72,14 +72,18 @@ def get_dataset(requires_train_and_valid=True) -> str:
                                     have train/ and valid/ sub-folders (i.e. for training)
     :return: path to dataset
     """
+    new_shell_section("Provide DATASET")
     found_dataset = False
     dataset_path = ""
     while not found_dataset:
         dataset_path = choose_directory(DATASETS_PATH)
         has_train_and_valid = dataset_has_train_valid_subfolders(dataset_path)
-        if has_train_and_valid != requires_train_and_valid:
-            print("valid/ and train/ not found (for TRAINING and VALIDATION) "
-                  "OR valid/ and train/ found but not needed (AUTO-LABEL)")
+        if has_train_and_valid and not requires_train_and_valid:
+            print("Wrong dataset :(")
+            print(dataset_path + " contains train/ and valid/ sub-folders.")
+            print("Please choose another dataset with all images and no sub-folders.")
+        elif not has_train_and_valid and requires_train_and_valid:
+            print(dataset_path + " does not have train/ and valid/ sub-folders.")
         else:
             found_dataset = True
     return dataset_path
@@ -90,45 +94,46 @@ def get_weights(model: str = "turnstiles"):
     :param model: YOLO model
     :return: path to .weights
     """
+    new_shell_section("Provide WEIGHTS file")
     list_weights = []
-    for filename in glob.glob(BACKUP_PATH + "\\" + '*.weights', recursive=True):
-        count = 0
-        if model in filename:
-            cfg_name = get_file_name_from_path(filename)
-            list_weights.append(filename)
-            print("   " + str(count) + " - " + cfg_name)
-            count += 1
+    for root, dirs, files in os.walk(BACKUP_PATH):
+        for file in files:
+            if file.endswith(".weights") and model in file:
+                filename = os.path.join(root, file)
+                list_weights.append(filename)
 
-    final_path = ask_user_option(list_weights, print_options=False)
+    final_path = ask_user_option(list_weights)
     return final_path
 
 
-def get_cfg(model: str = "turnstiles"):
+def get_cfg(num_classes: int, model: str = "turnstiles"):
     """
+    :param num_classes: number of classes calculated when reading classes.txt or darknet.labels.
+    cfg files with different number of classes won't be suggested.
     :param model: YOLO model
     :return: path to .cfg
     """
-
-    num_classes = 0
+    new_shell_section("Provide CFG file")
+    print('Please note that .cfg files with different number of classes than ' + str(num_classes) + ' are not shown')
     list_cfg = []
+    for root, dirs, files in os.walk(CFG_PATH):
+        for file in files:
+            if file.endswith(".cfg") and model in file:
+                filename = os.path.join(root, file)
+                if get_num_classes_from_cfg(filename) == num_classes:
+                    list_cfg.append(filename)
 
-    for filename in glob.glob(CFG_CUSTOM_PATH + "\\" + '*.cfg', recursive=True):
-        count = 0
-        if model in filename:
-            # read num classes
-            with open(filename, 'r+') as out:
-                lines = out.readlines()
-                for line in lines:
-                    if "classes" in line:
-                        num_classes = int(line.split("=")[1])
-                        break
-            cfg_name = get_file_name_from_path(filename)
-            list_cfg.append((filename, num_classes))
-            print("   " + str(count) + " - " + cfg_name + " (" + str(num_classes) + " classes)")
-            count += 1
+    cfg_path = ask_user_option(list_cfg)
+    return cfg_path
 
-    cfg_path, num_classes = ask_user_option([x for x, y in list_cfg], print_options=False)
-    return cfg_path, num_classes
+
+def get_num_classes_from_cfg(cfg_path: str) -> int:
+    with open(cfg_path, 'r+') as out:
+        lines = out.readlines()
+        for line in lines:
+            if "classes" in line:
+                num_classes = int(line.split("=")[1])
+                return num_classes
 
 
 def ask_user_path() -> str:
@@ -145,11 +150,14 @@ def ask_user_path() -> str:
             continue
 
 
-def get_classes(path: str) -> list:
+def get_classes(path: str) -> (list, int):
     """
     :param path: path to dataset
     :return: list of labels
     """
+    new_shell_section("Provide LABELS")
+
+    # look for existing classes.txt or labels.darknet at given path
     files = []
     for dirpath, dirnames, filenames in os.walk(path):
         for filename in [f for f in filenames if (f == "classes.txt" or f == "_darknet.labels")]:
@@ -157,18 +165,20 @@ def get_classes(path: str) -> list:
 
     if len(files) > 0:
         classes = read_classes(files[0])
-        return classes
+        print(classes)
+        return classes, len(classes)
     else:
-        print("classes.txt and _darknet.labels not found.")
-        print("Provide path to 'classes.txt' or '_darknet.labels':")
-        while True:
-            path2 = ask_user_path()
-            if "classes.txt" in path2 or "_darknet.labels" in path2:
-                classes = read_classes(path2)
-                return classes
-            else:
-                print("Wrong file name provided.")
-                continue
+        # propose existing files in data/datasets/
+        print("classes.txt and _darknet.labels not found at", path)
+        files = []
+        for dirpath, dirnames, filenames in os.walk(DATASETS_PATH):
+            for filename in [f for f in filenames if (f == "classes.txt" or f == "_darknet.labels")]:
+                files.append(os.path.join(dirpath, filename))
+        classes = read_classes(files[ask_user_option(
+            ["../" + get_file_name_from_path(x, element=3) + "/: " + ", ".join(read_classes(x)) for x in files],
+            return_idx=True)])
+        print(classes)
+        return classes, len(classes)
 
 
 def read_classes(file: str) -> list:
@@ -182,54 +192,53 @@ def read_classes(file: str) -> list:
     return classes
 
 
-def list_images(path_from: str, is_train: bool = True, copy_labels: bool = True):
+def copy_files_train_valid(path_from: str, OBJ: bool = True, copy_labels: bool = True):
     """
     Creates obj or valid folders, copies files from dataset and writes train.txt or valid.txt
     :param path_from: path to dataset where images are stored
-    :param is_train: if True, creates obj/ and writes in train.txt, else valid/ and valid.txt
+    :param OBJ: if True, creates obj/ and writes in train.txt, else valid/ and valid.txt
     """
+    folder_to = "train" if OBJ else "valid"
+    path_to = DATA_OBJ_PATH if OBJ else DATA_VALID_PATH
+    new_shell_section("Copying files to " + path_to + " and writting at " + folder_to + ".txt")
 
-    folder_to = "train" if is_train else "valid"
-    path_to = 'data\\obj\\' if is_train else 'data\\valid\\'
-
+    # create obj or valid
     try:
-        # create obj or valid
         if os.path.exists(path_to):
             shutil.rmtree(path_to)
         os.makedirs(path_to)
     except OSError:
         print("Creation of the directory %s failed" % path_to)
     else:
-        print("############### %s created", path_to)
-        print()
+        print("%s created", path_to)
 
-    # write in train.txt or valid.txt and copy images
     try:
+        with open(os.path.join(DATA_PATH, folder_to + '.txt'), 'w') as out:
+            for img in tqdm([f for f in os.listdir(path_from + '\\') if
+                        (f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg'))], desc="Writting in train.txt or valid.txt and copying files"):
 
-        with open(os.path.join('darknet_shell/data', folder_to + '.txt'), 'w') as out:
-            for img in [f for f in os.listdir(path_from + '\\') if
-                        (f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg'))]:
-                out.write(path_to + img + '\n')  # write in txt
-                shutil.copyfile(path_from + "\\" + img, path_to + img)  # copy images
+                image_path = os.path.join(path_to, img)
+                out.write(image_path + '\n')  # write in txt
+                shutil.copyfile(os.path.join(path_from, img), image_path)  # copy images
 
                 if copy_labels:
-                    img_name = get_file_name_from_path(img)
-                    shutil.copyfile(path_from + "\\" + img_name + ".txt",
-                                    path_to + img_name + ".txt")  # copy txt labels
+                    shutil.copyfile(os.path.join(path_from, img.split('.')[0]) + ".txt",
+                                    os.path.join(path_to, img.split('.')[0]) + ".txt")  # copy txt labels
     except OSError:
-        print("Error while copying images from (list_images()) %s", path_from)
-    else:
-        print("############### %s.txt written", folder_to)
-        print("############### images added to %s.txt written", folder_to)
-        print()
+        print("Error while copying images from %s", path_from)
 
 
-def update_obj_data(num_classes: int, create_backup: bool = False):
-    print()
+def update_obj_data(classes: list, create_backup: bool = False):
+    new_shell_section("Writing ../data/obj.data, ../data/obj.names, and ../data/coco.names")
     backup_path = "C:/darknet-master/backup/new_training_" + str(randint(0, 1000000))
-    text = "classes = " + str(num_classes) + "\n" + "train = data/train.txt\n" \
-           + "valid = data/valid.txt\n" + "names = data/obj.names\n" \
-           + "backup = " + backup_path
+
+    update_file(os.path.join(DATA_PATH, 'obj.data'), ["classes = " + str(len(classes)),
+                                                      "train = data/train.txt",
+                                                      "valid = data/valid.txt",
+                                                      "names = data/obj.names",
+                                                      "backup = " + backup_path])
+    update_file(os.path.join(DATA_PATH, 'obj.names'), classes)
+    update_file(os.path.join(DATA_PATH, 'coco.names'), classes)
 
     if create_backup:
         try:
@@ -238,13 +247,22 @@ def update_obj_data(num_classes: int, create_backup: bool = False):
             os.makedirs(backup_path)
         except OSError:
             print("Creation of the directory %s failed" % backup_path)
+        else:
+            print("Backup directory created at ", backup_path)
 
-    with open('darknet_shell/data/obj.data', 'r+') as myfile:
-        data = myfile.read()
-        myfile.seek(0)
-        myfile.write(text)
-        myfile.truncate()
 
-    print("############### data/obj.data updated with following: \n")
-    print(text)
-    print()
+def update_file(path: str, line_list: list):
+    """
+    :param path:
+    :param line_list: each line to be written to file
+    :return:
+    """
+    open(path, 'w').close()
+    with open(path, 'w') as file:
+        for listitem in line_list:
+            file.write('%s\n' % listitem)
+
+
+def new_shell_section(TITLE: str):
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print(TITLE)

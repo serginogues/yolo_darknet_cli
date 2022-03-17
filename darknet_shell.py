@@ -7,7 +7,7 @@ from utils import *
 
 
 def main():
-    print("Welcome to Darknet Shell :')")
+    new_shell_section("Welcome to Darknet Shell :')")
     action_key = ask_user_option(OPTIONS_LIST)
 
     if action_key == OPTIONS_LIST[0]:
@@ -34,6 +34,7 @@ def main():
 
 
 def get_model() -> str:
+    new_shell_section("Provide MODEL")
     model_key = ask_user_option(MODELS_LIST)
     keyword = "train"
     if model_key == MODELS_LIST[0]:
@@ -54,36 +55,21 @@ def auto_label_main():
     -thresh 0.25 -dont_show -save_labels < data/train.txt
     """
 
-    keyword = get_model()
-
-    # get cfg file path
-    cfg_path, num_classes = get_cfg(keyword)
-
-    # get backup path
-    weights_path = get_weights(keyword)
-
-    # dataset path
     dataset_path = get_dataset(False)
-
-    # update train.txt and copy images to obj/
-    list_images(dataset_path, copy_labels=False)
-
-    # update obj.data
-    update_obj_data(num_classes)
-
-    # update obj.names
-    classes = get_classes(dataset_path)
-    print(classes)
+    classes, num_classes = get_classes(dataset_path)
+    keyword = get_model()
+    cfg_path = get_cfg(num_classes, keyword)
+    weights_path = get_weights(keyword)
+    copy_files_train_valid(dataset_path, OBJ=True, copy_labels=False)
+    update_obj_data(classes, create_backup=False)
 
     # execute command
     full_cmd = AUTO_LABEL_CMD_INIT + cfg_path + " " + weights_path + AUTO_LABEL_CMD_END
 
-    clear = lambda: os.system('cls')
-    clear()
     print("The following command will be executed. Enter '0' to begin auto-labeling.")
     print()
     print(full_cmd)
-    ask_user_option(['Begin'])
+    ask_user_option(['Start'])
     os.system(full_cmd)
 
 
@@ -98,7 +84,6 @@ def crop():
     parser.add_argument('--format', type=str, default=".jpg",
                         help='Image type: .png, .jpg')
     """
-    from tqdm import tqdm
     from PIL import Image
 
     print("Provide path to folder with images and labels")
@@ -153,7 +138,6 @@ def count_labels():
                         help='path to folder with imgs and labels')
     parser.add_argument('--plot', type=bool, default="False")
     """
-    from tqdm import tqdm
 
     print("Would you like to plot results? (requires 'matplotlib' installed in current environment)")
     PLOT = True if ask_user_option(['Yes', 'No'], return_idx=True) == 0 else False
@@ -216,7 +200,6 @@ def export_image_with_given_label():
     parser.add_argument('--format', type=str, default=".jpg",
                         help='Image type: .png, .jpg')
     """
-    from tqdm import tqdm
     from PIL import Image
 
     print("Provide path to folder with images and labels")
