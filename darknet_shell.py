@@ -64,7 +64,7 @@ def auto_label_main():
     update_obj_data(classes, create_backup=False)
 
     # execute command
-    full_cmd = AUTO_LABEL_CMD_INIT + cfg_path + " " + weights_path + AUTO_LABEL_CMD_END
+    full_cmd = DARKNET_EXE_PATH + "detector test " + OBJ_DATA_FILE_PATH + " " + cfg_path + " " + weights_path + AUTO_LABEL_CMD_END
 
     print("The following command will be executed. Enter '0' to begin auto-labeling.")
     print()

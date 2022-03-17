@@ -234,7 +234,7 @@ def update_obj_data(classes: list, create_backup: bool = False):
     new_shell_section("Writing ../data/obj.data, ../data/obj.names, and ../data/coco.names")
     backup_path = "C:/darknet-master/backup/new_training_" + str(randint(0, 1000000))
 
-    update_file(os.path.join(DATA_PATH, 'obj.data'), ["classes = " + str(len(classes)),
+    update_file(OBJ_DATA_FILE_PATH, ["classes = " + str(len(classes)),
                                                       "train = data/train.txt",
                                                       "valid = data/valid.txt",
                                                       "names = data/obj.names",

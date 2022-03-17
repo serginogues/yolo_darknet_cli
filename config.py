@@ -18,12 +18,13 @@ OPTIONS_LIST = ["Auto-label images with trained model",
 
 MODELS_LIST = ["Andenes", "Tornos", "OCR"]
 
-AUTO_LABEL_CMD_INIT = "darknet.exe detector test data\obj.data "
+DARKNET_EXE_PATH = "C:\darknet-master\darknet.exe "
 AUTO_LABEL_CMD_END = " -thresh 0.25 -dont_show -save_labels < data/train.txt"
 
 BASE_PATH = "C:\\darknet-master"
 DATA_PATH = os.path.join(BASE_PATH, 'data')
 DATA_OBJ_PATH = os.path.join(DATA_PATH, 'obj')
+OBJ_DATA_FILE_PATH = os.path.join(DATA_PATH, 'obj.data')
 DATA_VALID_PATH = os.path.join(DATA_PATH, 'valid')
 DATASETS_PATH = os.path.join(DATA_PATH, 'datasets')
 DATASETS_CUSTOM_PATH = os.path.join(DATASETS_PATH, 'custom_models')
