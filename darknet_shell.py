@@ -89,7 +89,7 @@ def crop():
 
     print("Provide path to folder with images and labels")
     path = ask_user_path()
-    classes = get_classes(path)
+    classes, num_classes = get_classes(path)
     print("Enter desired class id to crop images:")
     label_id = ask_user_option(classes, return_idx=True)
     print("Provide output path:")
@@ -143,7 +143,7 @@ def count_labels():
     print("Would you like to plot results? (requires 'matplotlib' installed in current environment)")
     PLOT = True if ask_user_option(['Yes', 'No'], return_idx=True) == 0 else False
 
-    print("Provide path to folder with images and labels")
+    print("Provide path to folder with images and labels (no need to add \ at the end)")
     path = ask_user_path()
 
     if path[-1] != '\\':
@@ -205,7 +205,7 @@ def export_image_with_given_label():
     print("Provide path to folder with images and labels")
     path = ask_user_path()
 
-    classes = get_classes(path)
+    classes, num_classes = get_classes(path)
     print("Enter desired class id to crop images")
     label_id = ask_user_option(classes, return_idx=True)
     print("Provide output path (it will be created if it does not exist)")
