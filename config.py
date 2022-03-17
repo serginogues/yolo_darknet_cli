@@ -26,6 +26,8 @@ DATA_PATH = os.path.join(BASE_PATH, 'data')
 DATA_OBJ_PATH = os.path.join(DATA_PATH, 'obj')
 DATA_VALID_PATH = os.path.join(DATA_PATH, 'valid')
 DATASETS_PATH = os.path.join(DATA_PATH, 'datasets')
+DATASETS_CUSTOM_PATH = os.path.join(DATASETS_PATH, 'custom_models')
+DATASETS_OPEN_SOURCE_PATH = os.path.join(DATASETS_PATH, 'open_source_models')
 CFG_PATH = os.path.join(BASE_PATH, 'cfg')
 BACKUP_PATH = os.path.join(BASE_PATH, 'backup')
 

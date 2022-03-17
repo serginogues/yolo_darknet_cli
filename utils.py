@@ -76,7 +76,9 @@ def get_dataset(requires_train_and_valid=True) -> str:
     found_dataset = False
     dataset_path = ""
     while not found_dataset:
-        dataset_path = choose_directory(DATASETS_PATH)
+        print("Where is your dataset?")
+        pathh = ask_user_option([DATASETS_CUSTOM_PATH, DATASETS_OPEN_SOURCE_PATH])
+        dataset_path = choose_directory(pathh)
         has_train_and_valid = dataset_has_train_valid_subfolders(dataset_path)
         if has_train_and_valid and not requires_train_and_valid:
             print("Wrong dataset :(")
