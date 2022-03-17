@@ -50,8 +50,8 @@ def auto_label_main():
     """
     Example:
     darknet.exe detector test data\obj.data
-    cfg\custom-yolov4_496_train_all_classes.cfg
-    backup\train\yolov4\train_all_classes\496_train_all_classes\custom-yolov4_496_train_all_classes_final.weights
+    cfg\..\name.cfg
+    backup\..\name.weights
     -thresh 0.25 -dont_show -save_labels < data/train.txt
     """
 
@@ -145,7 +145,7 @@ def count_labels():
     parser.add_argument('--plot', type=bool, default="False")
     """
 
-    print("Would you like to plot results? (requires 'matplotlib' installed in current environment)")
+    print("Would you like to plot results?")
     PLOT = True if ask_user_option(['Yes', 'No'], return_idx=True) == 0 else False
 
     print("Provide path to folder with images and labels (no need to add \ at the end)")
@@ -201,7 +201,7 @@ def export_image_with_given_label():
     parser.add_argument('--output', type=str, default="output/",
                         help='path to folder with imgs and labels')
     parser.add_argument('--id', type=int, default=4,
-                        help='Id of the class from which to extract the crops per image. Default 4 (license_plate)')
+                        help='Id of the class from which to extract the crops per image.')
     parser.add_argument('--format', type=str, default=".jpg",
                         help='Image type: .png, .jpg')
     """
