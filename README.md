@@ -1,7 +1,7 @@
-# yolo_darknet_utils
+# yolo_darknet_cli
 ### Author: Sergi Nogués
 
-YOLO Darknet GUI for automated YOLOv4 model management.
+YOLO Darknet command-line interface for automated YOLOv4 model management.
 
 ```
 pip install -r requirements.txt
