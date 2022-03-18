@@ -15,7 +15,7 @@ def main():
         auto_label_main()
     elif action_key == OPTIONS_LIST[1]:
         # test
-        pass
+        test_main()
     elif action_key == OPTIONS_LIST[2]:
         # train
         pass
@@ -64,13 +64,45 @@ def auto_label_main():
     update_obj_data(classes, create_backup=False)
 
     # execute command
-    full_cmd = DARKNET_EXE_PATH + "detector test " + OBJ_DATA_FILE_PATH + " " + cfg_path + " " + weights_path + AUTO_LABEL_CMD_END
+    full_cmd = "darknet.exe detector test " + OBJ_DATA_FILE_PATH \
+               + " " + cfg_path + " " + weights_path \
+               + " -thresh 0.25 -dont_show -save_labels < data/train.txt"
 
-    print("Execute the following command at " + BASE_PATH)
     print()
+    print("Labels will be created at ../data/obj/")
+    print("Command: ")
     print(full_cmd)
+    print()
+    print("Enter '0' to start")
     os.chdir(BASE_PATH)
     ask_user_option(['Start'])
+    os.system(full_cmd)
+
+
+def test_main():
+    new_shell_section("Provide path to image or video including file extension .png, .jpg, .jpeg, .mp4, etc")
+    path = ask_user_path()
+    classes, num_classes = get_classes(path)
+    keyword = get_model()
+    cfg_path = get_cfg(num_classes, keyword)
+    weights_path = get_weights(keyword)
+
+    extension = "." + path.split(".")[-1]
+    isIMAGE = True if extension in IMG_FORMAT_LIST else False
+    if isIMAGE:
+        full_cmd = "darknet.exe detector test " + OBJ_DATA_FILE_PATH \
+                   + " " + cfg_path + " " + weights_path \
+                   + " " + path
+
+    else:
+        full_cmd = "darknet.exe detector demo " + OBJ_DATA_FILE_PATH \
+                   + " " + cfg_path + " " + weights_path \
+                   + " " + path + " -out_filename " \
+                   + os.path.join("\\".join(path.split("\\")[0:-1]),
+                     ".".join(get_file_name_from_path(path).split(".")[0:-1]) + "_output" + extension)
+
+    print(full_cmd)
+    os.chdir(BASE_PATH)
     os.system(full_cmd)
 
 

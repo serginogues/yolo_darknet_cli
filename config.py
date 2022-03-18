@@ -13,18 +13,16 @@ from joblib import Parallel, delayed
 from sewar.full_ref import mse, rmse, ergas
 import multiprocessing
 
-OPTIONS_LIST = ["Auto-label images with trained model (DONE)",
-                "Test a trained model",
-                "Train a new model",
-                "Crop and export Yolo labels (DONE)",
-                "Count label instances and images in Dataset (DONE)",
-                "Image similarity in a Dataset (DONE)",
-                "Export images containing specific object (DONE)"]
+OPTIONS_LIST = ["AUTO-LABEL (semi-supervised learning)",
+                "TEST trained model on SINGLE image or video",
+                "TRAIN a new model",
+                "VALIDATE a trained model"
+                "CROP labeled images",
+                "COUNT label instances and images in Dataset",
+                "Image SIMILARITY in a Dataset",
+                "EXPORT images BY LABEL"]
 
 MODELS_LIST = ["Andenes", "Tornos", "OCR"]
-
-DARKNET_EXE_PATH = "C:\darknet-master\darknet.exe "
-AUTO_LABEL_CMD_END = " -thresh 0.25 -dont_show -save_labels < data/train.txt"
 
 BASE_PATH = "C:\\darknet-master"
 DATA_PATH = os.path.join(BASE_PATH, 'data')

@@ -12,7 +12,7 @@ def get_file_name_from_path(path, element: int = 1):
     return path.split("\\")[-element]
 
 
-def ask_user_option(params: list, print_options: bool = True, return_idx: bool = False) -> int:
+def ask_user_option(params: list, print_options: bool = True, return_idx: bool = False):
     """
     :param return_idx: if True, returns index of chosen element in params, else returns element
     :param params: list of options from which the user has to choose
