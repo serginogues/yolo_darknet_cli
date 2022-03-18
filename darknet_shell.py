@@ -86,6 +86,8 @@ def test_main():
     keyword = get_model()
     cfg_path = get_cfg(num_classes, keyword)
     weights_path = get_weights(keyword)
+    update_file(os.path.join(DATA_PATH, 'obj.names'), classes)
+    update_file(os.path.join(DATA_PATH, 'coco.names'), classes)
 
     extension = "." + path.split(".")[-1]
     isIMAGE = True if extension in IMG_FORMAT_LIST else False
