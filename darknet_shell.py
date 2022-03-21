@@ -37,6 +37,15 @@ def get_model() -> str:
     return keyword
 
 
+def train_main():
+    """
+    darknet.exe detector train data\obj.data
+    cfg\..\X.cfg
+    """
+    dataset_path = get_dataset(True)
+    classes, num_classes = get_classes(dataset_path)
+
+
 def auto_label_main():
     """
     Example:
@@ -51,7 +60,10 @@ def auto_label_main():
     keyword = get_model()
     cfg_path = get_cfg(num_classes, keyword)
     weights_path = get_weights(keyword)
-    copy_files_train_valid(dataset_path, OBJ=True, copy_labels=False)
+    copy_files_and_write_path(path_dataset=dataset_path,
+                              path_to=DATA_OBJ_PATH,
+                              path_write=os.path.join(DATA_PATH, 'train.txt'),
+                              copy_labels=False)
     update_obj_data(classes, create_backup=False)
 
     # execute command
@@ -81,8 +93,7 @@ def test_main():
     update_file(os.path.join(DATA_PATH, 'coco.names'), classes)
 
     extension = "." + path.split(".")[-1]
-    isIMAGE = True if extension in IMG_FORMAT_LIST else False
-    if isIMAGE:
+    if extension in IMG_FORMAT_LIST:
         full_cmd = "darknet.exe detector test " + OBJ_DATA_FILE_PATH \
                    + " " + cfg_path + " " + weights_path \
                    + " " + path

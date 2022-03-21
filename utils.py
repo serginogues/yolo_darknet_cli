@@ -194,43 +194,47 @@ def read_classes(file: str) -> list:
     return classes
 
 
-def copy_files_train_valid(path_from: str, OBJ: bool = True, copy_labels: bool = True):
+def copy_files_and_write_path(path_dataset: str, path_to: str,  path_write: str, copy_labels: bool):
     """
-    Creates obj or valid folders, copies files from dataset and writes train.txt or valid.txt
-    :param path_from: path to dataset where images are stored
-    :param OBJ: if True, creates obj/ and writes in train.txt, else valid/ and valid.txt
+    Do not add \\ at the end of any path
+    :param path_dataset: dataset where images are stored
+    :param path_to: path to folder where images are copied to
+    :param path_write: path to txt file where image paths are written
+    :param copy_labels: if True, path_dataset/ contains labels
     """
-    folder_to = "train" if OBJ else "valid"
-    path_to = DATA_OBJ_PATH if OBJ else DATA_VALID_PATH
-    new_shell_section("Copying files to " + path_to + " and writting at " + folder_to + ".txt")
+    new_shell_section("Copying images from: " + path_dataset)
+    print("To: " + path_to)
+    print("Copying label files (.txt) ? " + "Yes" if copy_labels else "No")
+    print("Writting paths at: " + path_write)
 
-    # create obj or valid
     try:
         if os.path.exists(path_to):
             shutil.rmtree(path_to)
         os.makedirs(path_to)
     except OSError:
         print("Creation of the directory %s failed" % path_to)
-    else:
-        print("%s created", path_to)
 
-    try:
-        with open(os.path.join(DATA_PATH, folder_to + '.txt'), 'w') as out:
-            for img in tqdm([f for f in os.listdir(path_from + '\\') if
-                        (f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg'))], desc="Writting in train.txt or valid.txt and copying files"):
+    with open(path_write, 'w') as out:
+        for img in tqdm([f for f in os.listdir(path_dataset + '\\') if
+                         (f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg'))],
+                        desc="Copying files"):
 
-                image_path = os.path.join(path_to, img)
-                out.write(image_path + '\n')  # write in txt
-                shutil.copyfile(os.path.join(path_from, img), image_path)  # copy images
+            # img = name.png
+            image_path = os.path.join(path_to, img)
+            out.write(image_path + '\n')  # write in txt
+            shutil.copyfile(os.path.join(path_dataset, img), image_path)  # copy images
 
-                if copy_labels:
-                    shutil.copyfile(os.path.join(path_from, img.split('.')[0]) + ".txt",
-                                    os.path.join(path_to, img.split('.')[0]) + ".txt")  # copy txt labels
-    except OSError:
-        print("Error while copying images from %s", path_from)
+            if copy_labels:
+                image_labels = img.split('.')[0] + ".txt"
+                shutil.copyfile(os.path.join(path_dataset, image_labels), os.path.join(path_to, image_labels))
 
 
 def update_obj_data(classes: list, create_backup: bool = False):
+    """
+    - Update obj.data \n
+    - Update obj.names and coco.names \n
+    - Create backup (if 'create_backup' = True)
+    """
     new_shell_section("Writing ../data/obj.data, ../data/obj.names, and ../data/coco.names")
     backup_path = "C:/darknet-master/backup/new_training_" + str(randint(0, 1000000))
 
@@ -249,8 +253,6 @@ def update_obj_data(classes: list, create_backup: bool = False):
             os.makedirs(backup_path)
         except OSError:
             print("Creation of the directory %s failed" % backup_path)
-        else:
-            print("Backup directory created at ", backup_path)
 
 
 def update_file(path: str, line_list: list):
