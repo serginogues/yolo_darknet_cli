@@ -12,15 +12,16 @@ import numpy as np
 from joblib import Parallel, delayed
 from sewar.full_ref import mse, rmse, ergas
 import multiprocessing
+import matplotlib.pyplot as plt
 
 OPTIONS_LIST = ["AUTO-LABEL (semi-supervised learning)",  # 0
-                "TEST trained model on SINGLE image or video", # 1
-                "TRAIN a new model", # 2
-                "VALIDATE a trained model" # 3
-                "CROP labeled images", # 4
-                "COUNT label instances and images in Dataset", # 5
-                "Image SIMILARITY in a Dataset", # 6
-                "EXPORT images BY LABEL"] # 7
+                "TEST trained model on SINGLE image or video",  # 1
+                "TRAIN a new model",  # 2
+                "VALIDATE a trained model"  # 3
+                "CROP labeled images",  # 4
+                "COUNT label instances and images in Dataset",  # 5
+                "Image SIMILARITY in a Dataset",  # 6
+                "EXPORT images BY LABEL"]  # 7
 
 MODELS_LIST = ["Andenes", "Tornos", "OCR"]
 

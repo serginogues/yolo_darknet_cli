@@ -91,7 +91,7 @@ def get_dataset(requires_train_and_valid=True) -> str:
     return dataset_path
 
 
-def get_weights(model: str = "turnstiles"):
+def get_weights(model: str = "turnstiles") -> str:
     """
     :param model: YOLO model
     :return: path to .weights
@@ -108,7 +108,7 @@ def get_weights(model: str = "turnstiles"):
     return final_path
 
 
-def get_cfg(num_classes: int, model: str = "turnstiles"):
+def get_cfg(num_classes: int, model: str = "turnstiles") -> str:
     """
     :param num_classes: number of classes calculated when reading classes.txt or darknet.labels.
     cfg files with different number of classes won't be suggested.
@@ -127,6 +127,84 @@ def get_cfg(num_classes: int, model: str = "turnstiles"):
 
     cfg_path = ask_user_option(list_cfg)
     return cfg_path
+
+
+def create_cfg(num_classes: int) -> str:
+    """
+    Create .cfg file
+    """
+    # get existing cfg file
+    new_shell_section("Please provide existing .cfg file to be used as arquitecture")
+    list_cfg = []
+    for root, dirs, files in os.walk(CFG_PATH):
+        for file in files:
+            if file.endswith(".cfg"):
+                filename = os.path.join(root, file)
+                list_cfg.append(filename)
+    CFG_PATH_OLD = ask_user_option(list_cfg)
+
+    # create new .cfg file
+    done = False
+    CFG_PATH_NEW = ""
+    while not done:
+        cfg_name_new = input(
+            "Please write the desired name for the NEW .cfg file. Do not add '.cfg' add the end! Example: dogs_cfg1")
+        CFG_PATH_NEW = os.path.join(CFG_PATH, cfg_name_new + '.cfg')
+        try:
+            f = open(CFG_PATH_NEW, "x")
+            f.close()
+            done = True
+        except FileExistsError:
+            print(CFG_PATH_NEW + " already exists!")
+
+    # get content of old file and save new content
+    max_batches, steps1, steps2, filters = cfg_hyperparams(num_classes)
+    rows = []
+    with open(CFG_PATH_OLD) as f:
+        lines = f.readlines()
+        for idx, line in tqdm(enumerate(lines), desc="Reading " + CFG_PATH_OLD):
+            new_line = line
+            if 'max_batches' in line:
+                new_line = "max_batches=" + str(max_batches)
+            elif 'steps=' in line:
+                new_line = 'steps=' + str(steps1) + '.0,' + str(steps2) + '.0'
+            elif '[yolo]' in line:
+                """
+                Example:
+                    [convolutional]
+                    size=1
+                    stride=1
+                    pad=1
+                    filters=51
+                    activation=linear
+                    
+                    [yolo] <- [you are here]
+                    mask = 0,1,2
+                    anchors = 12, 16, 19, 36, 40, 28, 36, 75, 76, 55, 72, 146, 142, 110, 192, 243, 459, 401
+                    classes=12
+                """
+                rows[-3] = 'filters=' + str(filters)
+                rows[idx + 3] = 'classes=' + str(num_classes)
+
+            rows.append(new_line)
+
+    # overwrite .cfg fle
+    update_file(path=CFG_PATH_NEW, line_list=rows)
+    return CFG_PATH_NEW
+
+
+def cfg_hyperparams(num_classes: int):
+    """
+    compute yolo hyperparams
+    :param num_classes: number of classes
+    :return: max_batches, steps1, steps2, filters
+    """
+    val = 2000 * num_classes
+    max_batches = int(val) if val > 6000 else 6000
+    steps1 = int(0.8 * max_batches)
+    steps2 = int(0.9 * max_batches)
+    filters = int((5 + num_classes) * 3)
+    return max_batches, steps1, steps2, filters
 
 
 def get_num_classes_from_cfg(cfg_path: str) -> int:

@@ -5,19 +5,17 @@ Darknet Shell MAINSCRIPT
 from config import *
 from utils import *
 
+#TODO:
+# - train_main() check if it works
+# - valid_main()
+
 
 def main():
-    new_shell_section("Welcome to Darknet Shell :')")
     action_key = ask_user_option(OPTIONS_LIST)
-
     if action_key == OPTIONS_LIST[0]:   auto_label_main()
     elif action_key == OPTIONS_LIST[1]: test_main()
-    elif action_key == OPTIONS_LIST[2]:
-        # train
-        pass
-    elif action_key == OPTIONS_LIST[3]:
-        # validate
-        pass
+    elif action_key == OPTIONS_LIST[2]: train_main()
+    elif action_key == OPTIONS_LIST[3]: validate_main()
     elif action_key == OPTIONS_LIST[4]: crop()
     elif action_key == OPTIONS_LIST[5]: count_labels()
     elif action_key == OPTIONS_LIST[6]: img_similarity()
@@ -55,8 +53,20 @@ def train_main():
                               path_write=os.path.join(DATA_PATH, 'valid.txt'),
                               copy_labels=True)
     update_obj_data(classes, create_backup=True)
+    cfg_path = create_cfg(num_classes)
 
-    #Todo: create_cfg(), execute full_cmd
+    full_cmd = "darknet.exe detector train " + OBJ_DATA_FILE_PATH + " " + cfg_path
+    new_shell_section("Command: ")
+    print(full_cmd)
+    print()
+    print("Enter '0' to start")
+    os.chdir(BASE_PATH)
+    ask_user_option(['Start'])
+    os.system(full_cmd)
+
+
+def validate_main():
+    pass
 
 
 def auto_label_main():
@@ -231,7 +241,6 @@ def count_labels():
         print(classes[i] + " - " + str(count_instances[i]) + " - " + str(count_images[i]))
 
     if PLOT:
-        import matplotlib.pyplot as plt
         plt.subplot(121)
         plt.pie(count_instances, labels=classes, autopct='%1.1f%%', startangle=90)
         plt.title("Instances per class (" + str(total_instances) + ")")
