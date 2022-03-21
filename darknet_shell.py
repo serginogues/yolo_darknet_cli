@@ -18,18 +18,10 @@ def main():
     elif action_key == OPTIONS_LIST[3]:
         # validate
         pass
-    elif action_key == OPTIONS_LIST[3]:
-        # crop
-        crop()
-    elif action_key == OPTIONS_LIST[4]:
-        # count labels
-        count_labels()
-    elif action_key == OPTIONS_LIST[5]:
-        # img similarity
-        img_similarity()
-    elif action_key == OPTIONS_LIST[6]:
-        # export by class
-        export_image_with_given_label()
+    elif action_key == OPTIONS_LIST[4]: crop()
+    elif action_key == OPTIONS_LIST[5]: count_labels()
+    elif action_key == OPTIONS_LIST[6]: img_similarity()
+    elif action_key == OPTIONS_LIST[7]: export_image_with_given_label()
 
 
 def get_model() -> str:
