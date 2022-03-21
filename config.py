@@ -25,14 +25,17 @@ OPTIONS_LIST = ["AUTO-LABEL (semi-supervised learning)",  # 0
 MODELS_LIST = ["Andenes", "Tornos", "OCR"]
 
 BASE_PATH = "C:\\darknet-master"
-DATA_PATH = os.path.join(BASE_PATH, 'data')
-DATA_OBJ_PATH = os.path.join(DATA_PATH, 'obj')
-OBJ_DATA_FILE_PATH = os.path.join(DATA_PATH, 'obj.data')
-DATA_VALID_PATH = os.path.join(DATA_PATH, 'valid')
-DATASETS_PATH = os.path.join(DATA_PATH, 'datasets')
-DATASETS_CUSTOM_PATH = os.path.join(DATASETS_PATH, 'custom_models')
-DATASETS_OPEN_SOURCE_PATH = os.path.join(DATASETS_PATH, 'open_source_models')
-CFG_PATH = os.path.join(BASE_PATH, 'cfg')
-BACKUP_PATH = os.path.join(BASE_PATH, 'backup')
+
+DATA_PATH = os.path.join(BASE_PATH, 'data')  # /data/
+OBJ_DATA_FILE_PATH = os.path.join(DATA_PATH, 'obj.data')  # /data/obj.data
+DATA_OBJ_PATH = os.path.join(DATA_PATH, 'obj')  # /data/obj/
+DATA_VALID_PATH = os.path.join(DATA_PATH, 'valid')  # data/valid/
+
+DATASETS_PATH = os.path.join(DATA_PATH, 'datasets')  # data/datasets/
+DATASETS_CUSTOM_PATH = os.path.join(DATASETS_PATH, 'custom_models')  # data/datasets/custom_models/
+DATASETS_OPEN_SOURCE_PATH = os.path.join(DATASETS_PATH, 'open_source_models')  # data/datasets/open_source_models/
+
+CFG_PATH = os.path.join(BASE_PATH, 'cfg')  # /data/cfg/
+BACKUP_PATH = os.path.join(BASE_PATH, 'backup')  # data/backup/
 
 IMG_FORMAT_LIST = ['.jpg', '.jpeg', '.png']

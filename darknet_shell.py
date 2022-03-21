@@ -43,7 +43,20 @@ def train_main():
     cfg\..\X.cfg
     """
     dataset_path = get_dataset(True)
-    classes, num_classes = get_classes(dataset_path)
+    train_path = os.path.join(dataset_path, 'train')
+    valid_path = os.path.join(dataset_path, 'valid')
+    classes, num_classes = get_classes(train_path)
+    copy_files_and_write_path(path_dataset=train_path,
+                              path_to=DATA_OBJ_PATH,
+                              path_write=os.path.join(DATA_PATH, 'train.txt'),
+                              copy_labels=True)
+    copy_files_and_write_path(path_dataset=valid_path,
+                              path_to=DATA_VALID_PATH,
+                              path_write=os.path.join(DATA_PATH, 'valid.txt'),
+                              copy_labels=True)
+    update_obj_data(classes, create_backup=True)
+
+    #Todo: create_cfg(), execute full_cmd
 
 
 def auto_label_main():
