@@ -10,14 +10,13 @@ def main():
     new_shell_section("Welcome to Darknet Shell :')")
     action_key = ask_user_option(OPTIONS_LIST)
 
-    if action_key == OPTIONS_LIST[0]:
-        # auto-label
-        auto_label_main()
-    elif action_key == OPTIONS_LIST[1]:
-        # test
-        test_main()
+    if action_key == OPTIONS_LIST[0]:   auto_label_main()
+    elif action_key == OPTIONS_LIST[1]: test_main()
     elif action_key == OPTIONS_LIST[2]:
         # train
+        pass
+    elif action_key == OPTIONS_LIST[3]:
+        # validate
         pass
     elif action_key == OPTIONS_LIST[3]:
         # crop
