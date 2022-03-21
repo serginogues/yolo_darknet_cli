@@ -66,7 +66,34 @@ def train_main():
 
 
 def validate_main():
-    pass
+    """
+    darknet.exe detector map data\obj.data
+    cfg\..\X.cfg
+    backup\..\Y.weights
+    """
+    dataset_path = get_dataset(True)
+    valid_path = os.path.join(dataset_path, 'valid')
+    classes, num_classes = get_classes(valid_path)
+    copy_files_and_write_path(path_dataset=valid_path,
+                              path_to=DATA_VALID_PATH,
+                              path_write=os.path.join(DATA_PATH, 'valid.txt'),
+                              copy_labels=True)
+    update_obj_data(classes, create_backup=False)
+    keyword = get_model()
+    cfg_path = get_cfg(num_classes, keyword)
+    weights_path = get_weights(keyword)
+
+    full_cmd = "darknet.exe detector map " + OBJ_DATA_FILE_PATH \
+               + " " + cfg_path + " " + weights_path
+
+    print()
+    new_shell_section("Command:")
+    print(full_cmd)
+    print()
+    print("Enter '0' to start")
+    os.chdir(BASE_PATH)
+    ask_user_option(['Start'])
+    os.system(full_cmd)
 
 
 def auto_label_main():
