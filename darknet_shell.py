@@ -142,7 +142,8 @@ def test_main():
     update_file(os.path.join(DATA_PATH, 'obj.names'), classes)
     update_file(os.path.join(DATA_PATH, 'coco.names'), classes)
 
-    extension = "." + path.split(".")[-1]
+    path_name = os.path.splitext(path)[0]
+    extension = os.path.splitext(path)[1]
     if extension in IMG_FORMAT_LIST:
         full_cmd = "darknet.exe detector test " + OBJ_DATA_FILE_PATH \
                    + " " + cfg_path + " " + weights_path \
@@ -152,8 +153,7 @@ def test_main():
         full_cmd = "darknet.exe detector demo " + OBJ_DATA_FILE_PATH \
                    + " " + cfg_path + " " + weights_path \
                    + " " + path + " -out_filename " \
-                   + os.path.join("\\".join(path.split("\\")[0:-1]),
-                     ".".join(get_file_name_from_path(path).split(".")[0:-1]) + "_output" + extension)
+                   + path_name + "_output" + extension
 
     print(full_cmd)
     os.chdir(BASE_PATH)

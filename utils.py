@@ -163,28 +163,31 @@ def create_cfg(num_classes: int) -> str:
     with open(CFG_PATH_OLD) as f:
         lines = f.readlines()
         for idx, line in tqdm(enumerate(lines), desc="Reading " + CFG_PATH_OLD):
-            new_line = line
+
             if 'max_batches' in line:
                 new_line = "max_batches=" + str(max_batches)
             elif 'steps=' in line:
                 new_line = 'steps=' + str(steps1) + '.0,' + str(steps2) + '.0'
-            elif '[yolo]' in line:
+            elif 'filters=' in line and '[yolo]' in lines[idx + 3] and '[convolutional]' in lines[idx - 4]:
                 """
                 Example:
                     [convolutional]
                     size=1
                     stride=1
                     pad=1
-                    filters=51
+                    filters=51 <- [you are here]
                     activation=linear
-                    
-                    [yolo] <- [you are here]
+
+                    [yolo] 
                     mask = 0,1,2
                     anchors = 12, 16, 19, 36, 40, 28, 36, 75, 76, 55, 72, 146, 142, 110, 192, 243, 459, 401
                     classes=12
                 """
-                rows[-3] = 'filters=' + str(filters)
-                rows[idx + 3] = 'classes=' + str(num_classes)
+                new_line = 'filters=' + str(filters)
+            elif 'classes=' in line and '[yolo]' in lines[idx - 3]:
+                new_line = 'classes=' + str(num_classes)
+            else:
+                new_line = line.split('\n')[0]
 
             rows.append(new_line)
 
@@ -303,7 +306,7 @@ def copy_files_and_write_path(path_dataset: str, path_to: str,  path_write: str,
             shutil.copyfile(os.path.join(path_dataset, img), image_path)  # copy images
 
             if copy_labels:
-                image_labels = img.split('.')[0] + ".txt"
+                image_labels = os.path.splitext(img)[0] + ".txt"
                 shutil.copyfile(os.path.join(path_dataset, image_labels), os.path.join(path_to, image_labels))
 
 
