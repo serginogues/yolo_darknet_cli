@@ -1,13 +1,9 @@
 """
-Darknet Shell MAINSCRIPT
+MAINSCRIPT
 """
 
 from config import *
 from utils import *
-
-#TODO:
-# - train_main() check if it works
-# - valid_main()
 
 
 def main():
