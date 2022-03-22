@@ -16,6 +16,7 @@ def main():
     elif action_key == OPTIONS_LIST[5]: count_labels()
     elif action_key == OPTIONS_LIST[6]: img_similarity()
     elif action_key == OPTIONS_LIST[7]: export_image_with_given_label()
+    elif action_key == OPTIONS_LIST[8]: schedule_save_weights()
 
 
 def get_model() -> str:
@@ -437,6 +438,49 @@ def img_similarity():
     for f in IMG_FORMAT_LIST:
         run_by_type(f)
     print("New dataset size: " + str(len(image_array)))
+
+
+def schedule_save_weights():
+    from datetime import datetime
+    from apscheduler.schedulers.background import BlockingScheduler
+    from os import listdir
+    from os.path import isfile, join
+
+    new_shell_section("Provide path to backup sub-folder where .weights are being saved while training")
+    PATH_FROM = ask_user_path()
+    if PATH_FROM[-1] != '\\':
+        PATH_FROM = PATH_FROM + "\\"
+
+    print()
+    print("Provide path to destination folder (where .weights file will be copied)")
+    PATH_TO = ask_user_path()
+
+    print("Job scheduled. Please keep this shell open.")
+
+    # Define the function that is to be executed at a scheduled time
+    def job_function():
+        onlyfiles = [(f, join(PATH_FROM, f)) for f in listdir(PATH_FROM) if isfile(join(PATH_FROM, f)) and 'last' in f]
+        print(onlyfiles)
+        if len(onlyfiles) > 0:
+            timeis = datetime.now().time().strftime('%H')
+
+            file_name = onlyfiles[0][0]
+            file_path = onlyfiles[0][1]
+            file_path_end = os.path.join(PATH_TO, file_name)
+            file_path_end2 = os.path.splitext(file_path_end)[0] + '_' + str(timeis) + os.path.splitext(file_path_end)[1]
+            print(timeis)
+            print("File found: " + file_path)
+            print("Copied to: " + file_path_end2)
+            shutil.copyfile(file_path, file_path_end2)
+
+    # BlockingScheduler: use when the scheduler is the only thing running in your process
+    scheduler = BlockingScheduler()
+
+    # Schedules the job_function to be executed Monday through Friday at between 12-16 at specific times.
+    scheduler.add_job(job_function, 'interval', hours=1)
+
+    # Start the scheduler
+    scheduler.start()
 
 
 if __name__ == '__main__':
