@@ -143,11 +143,11 @@ def test_main():
             print("File not found :(")
 
     classes, num_classes = get_classes(path)
-    keyword = get_model()
-    cfg_path = get_cfg(num_classes, keyword)
-    weights_path = get_weights(keyword)
+    cfg_path = get_cfg(num_classes, "")
+    weights_path = get_weights("")
     update_file(os.path.join(DATA_PATH, 'obj.names'), classes)
     update_file(os.path.join(DATA_PATH, 'coco.names'), classes)
+    update_obj_data(classes, create_backup=False)
 
     path_name = os.path.splitext(path)[0]
     extension = os.path.splitext(path)[1]
