@@ -7,6 +7,7 @@ from utils import *
 
 
 def main():
+    os.system('cls' if os.name == 'nt' else 'clear')
     action_key = ask_user_option(OPTIONS_LIST)
     if action_key == OPTIONS_LIST[0]:   auto_label_main()
     elif action_key == OPTIONS_LIST[1]: test_main()
@@ -50,7 +51,9 @@ def train_main():
                               path_write=os.path.join(DATA_PATH, 'valid.txt'),
                               copy_labels=True)
     update_obj_data(classes, create_backup=True)
-    cfg_path = create_cfg(num_classes)
+
+    new_shell_section("Do you want to create a new cfg or use an existing one?")
+    cfg_path = create_cfg(num_classes) if ask_user_option(['Create NEW .cfg file', 'Use existing .cfg file'], return_idx=True) == 0 else get_cfg(num_classes, "")
 
     full_cmd = "darknet.exe detector train " + OBJ_DATA_FILE_PATH + " " + cfg_path
     new_shell_section("Command: ")
@@ -119,10 +122,9 @@ def auto_label_main():
                + " -thresh 0.25 -dont_show -save_labels < data/train.txt"
 
     print()
-    print("Labels will be created at ../data/obj/")
-    print("Command: ")
+    print("Labels will be created at: ../data/obj/")
+    new_shell_section("Command: ")
     print(full_cmd)
-    print()
     print("Enter '0' to start")
     os.chdir(BASE_PATH)
     ask_user_option(['Start'])
@@ -130,8 +132,16 @@ def auto_label_main():
 
 
 def test_main():
-    new_shell_section("Provide path to image or video including file extension .png, .jpg, .jpeg, .mp4, etc")
-    path = ask_user_path()
+    good = False
+    while not good:
+        print()
+        print("Provide path to image or video including file extension .png, .jpg, .jpeg, .mp4, etc")
+        path = ask_user_path()
+        if os.path.isfile(path):
+            good = True
+        else:
+            print("File not found :(")
+
     classes, num_classes = get_classes(path)
     keyword = get_model()
     cfg_path = get_cfg(num_classes, keyword)
@@ -152,7 +162,7 @@ def test_main():
                    + " " + path + " -out_filename " \
                    + path_name + "_output" + extension
 
-    print(full_cmd)
+    new_shell_section(full_cmd)
     os.chdir(BASE_PATH)
     os.system(full_cmd)
 

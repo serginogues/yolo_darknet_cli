@@ -25,6 +25,7 @@ def ask_user_option(params: list, print_options: bool = True, return_idx: bool =
             print(str(idx) + " - " + opt)
     while True:
         try:
+            print()
             action = int(input("Choose an option (write option number):"))
             if 0 <= action < len(params):
                 print()
@@ -146,9 +147,10 @@ def create_cfg(num_classes: int) -> str:
     # create new .cfg file
     done = False
     CFG_PATH_NEW = ""
+    print("Please write the desired name for the NEW .cfg file. Do not add '.cfg' add the end! Example: dogs_cfg1")
     while not done:
-        cfg_name_new = input(
-            "Please write the desired name for the NEW .cfg file. Do not add '.cfg' add the end! Example: dogs_cfg1")
+
+        cfg_name_new = input("Write name: ")
         CFG_PATH_NEW = os.path.join(CFG_PATH, cfg_name_new + '.cfg')
         try:
             f = open(CFG_PATH_NEW, "x")
@@ -252,13 +254,14 @@ def get_classes(path: str) -> (list, int):
         return classes, len(classes)
     else:
         # propose existing files in data/datasets/
-        print("classes.txt and _darknet.labels not found at", path)
+        print("classes.txt and _darknet.labels not found.")
+        print("Please choose from available classes.txt files.")
         files = []
         for dirpath, dirnames, filenames in os.walk(DATASETS_PATH):
             for filename in [f for f in filenames if (f == "classes.txt" or f == "_darknet.labels")]:
                 files.append(os.path.join(dirpath, filename))
         classes = read_classes(files[ask_user_option(
-            ["../" + get_file_name_from_path(x, element=3) + "/: " + ", ".join(read_classes(x)) for x in files],
+            [", ".join(read_classes(x)) for x in files],
             return_idx=True)])
         print(classes)
         return classes, len(classes)
@@ -285,7 +288,7 @@ def copy_files_and_write_path(path_dataset: str, path_to: str,  path_write: str,
     """
     new_shell_section("Copying images from: " + path_dataset)
     print("To: " + path_to)
-    print("Copying label files (.txt) ? " + "Yes" if copy_labels else "No")
+    print("Copying label files (.txt) ? " + "Yes" if copy_labels else "Copying label files (.txt) ? " + "No")
     print("Writting paths at: " + path_write)
 
     try:
@@ -349,5 +352,7 @@ def update_file(path: str, line_list: list):
 
 
 def new_shell_section(TITLE: str):
-    os.system('cls' if os.name == 'nt' else 'clear')
-    print(TITLE)
+    print()
+    # os.system('cls' if os.name == 'nt' else 'clear')
+    print("############### " + TITLE + " ################")
+    print()
