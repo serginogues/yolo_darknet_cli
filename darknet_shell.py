@@ -150,7 +150,7 @@ def validate_and_compare():
         f1_list.append(float(text.split("F1-score = ")[1].split("\n")[0]))
         mAP_list.append(float(text.split("(mAP@0.50) = ")[1].split(",")[0]))
 
-        lines = text.split("\n")[0]
+        lines = text.split("\n")
         for i in range(num_classes):
             list_c = []
             c_name = lines[i].split("name = ")[1].split(",")[0]
