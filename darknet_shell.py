@@ -151,8 +151,9 @@ def validate_and_compare():
         mAP_list.append(float(text.split("(mAP@0.50) = ")[1].split(",")[0]))
 
         lines = text.split("\n")
+        new_shell_section("LINES")
+        print(lines)
         for i in range(num_classes):
-            list_c = []
             c_name = lines[i].split("name = ")[1].split(",")[0]
             av_p = float(lines[i].split("ap = ")[1].split("%")[0])
             if c_name == classes[i]:
