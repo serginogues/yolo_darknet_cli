@@ -153,11 +153,11 @@ def validate_and_compare():
         lines = text.split("\n")
         counter = 0
         for i in range(len(lines)):
-            if "class_id = " in lines[i]:
-                counter += 1
+            if "class_id = " in lines[i] and "name = " in lines[i]:
                 # c_name = lines[i].split("name = ")[1].split(",")[0]
                 av_p = float(lines[i].split("ap = ")[1].split("%")[0])
                 class_ap[counter].append(av_p)
+                counter += 1
 
             if counter == num_classes:
                 break
