@@ -14,6 +14,7 @@ from joblib import Parallel, delayed
 from sewar.full_ref import mse, rmse, ergas
 import multiprocessing
 import matplotlib.pyplot as plt
+import pandas as pd
 
 OPTIONS_LIST = ["AUTO-LABEL (semi-supervised learning)",  # 0
                 "TEST trained model on SINGLE image or video",  # 1

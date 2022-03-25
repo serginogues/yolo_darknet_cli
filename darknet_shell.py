@@ -126,7 +126,11 @@ def validate_and_compare():
         else:
             done = True
 
-    printed_results = []
+    precision_list = []
+    recall_list = []
+    f1_list = []
+    mAP_list = []
+    v_names = []
     for idx, v in enumerate(versions):
         cfg_name = get_file_name_from_path(os.path.splitext(v[0])[0])
         weights_name = get_file_name_from_path(os.path.splitext(v[1])[0])
@@ -138,12 +142,18 @@ def validate_and_compare():
         os.chdir(BASE_PATH)
         subprocess.call(full_cmd, shell=True)
         f = open(file_path, "r")
-        printed_results.append(f.read())
+        text = f.read()
+        v_names.append(str(cfg_name + "_" + weights_name))
+        precision_list.append(float(text.split("precision = ")[1].split(",")[0]))
+        recall_list.append(float(text.split("recall = ")[1].split(",")[0]))
+        f1_list.append(float(text.split("F1-score = ")[1].split("\n")[0]))
+        mAP_list.append(float(text.split("(mAP@0.50) = ")[1].split(",")[0]))
 
-    new_shell_section("Results")
-    for x in printed_results:
-        print(x)
-        print("\n")
+    df = pd.DataFrame({'precision': precision_list, 'recall': recall_list, 'f1': f1_list, 'mAP': mAP_list}, index=v_names)
+    ax = df.plot.bar(rot=0)
+    ax.plot()
+    plt.show()
+
 
 def auto_label_main():
     """
