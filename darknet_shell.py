@@ -1,7 +1,6 @@
 """
 MAINSCRIPT
 """
-
 from config import *
 from utils import *
 
@@ -18,6 +17,7 @@ def main():
     elif action_key == OPTIONS_LIST[6]: img_similarity()
     elif action_key == OPTIONS_LIST[7]: export_image_with_given_label()
     elif action_key == OPTIONS_LIST[8]: schedule_save_weights()
+    elif action_key == OPTIONS_LIST[9]: validate_and_compare()
 
 
 def get_model() -> str:
@@ -93,6 +93,52 @@ def validate_main():
     os.chdir(BASE_PATH)
     ask_user_option(['Start'])
     os.system(full_cmd)
+
+
+def validate_and_compare():
+    """
+    - weights after training -> 1 .cfg
+    - versio nova amb actual -> >1 .cfg
+    - comparar influencia hyperparams
+    :return:
+    """
+    dataset_path = get_dataset(True)
+    valid_path = os.path.join(dataset_path, 'valid')
+    classes, num_classes = get_classes(valid_path)
+    copy_files_and_write_path(path_dataset=valid_path,
+                              path_to=DATA_VALID_PATH,
+                              path_write=os.path.join(DATA_PATH, 'valid.txt'),
+                              copy_labels=True)
+    update_obj_data(classes, create_backup=False)
+
+    versions = []  # models[idx] = (path_cfg, path_weight)
+    done = False
+    while not done:
+        # get cfg and get weights
+        cfg_path = get_cfg(num_classes, "")
+        weights_path = get_weights("")
+        versions.append((cfg_path, weights_path))
+
+        print("Do you want to add another version to the list?")
+        ADD = True if ask_user_option(['Yes', 'No'], return_idx=True) == 0 else False
+        if ADD:
+            continue
+        else:
+            done = True
+
+    printed_results = []
+    for idx, v in enumerate(versions):
+        cfg_name = get_file_name_from_path(os.path.splitext(v[0])[0])
+        weights_name = get_file_name_from_path(os.path.splitext(v[1])[0])
+        file_path = "C:/darknet-master/results/results_" + cfg_name + "_" + weights_name + ".txt"
+        open(file_path, 'w').close()
+        full_cmd = "darknet.exe detector map " + OBJ_DATA_FILE_PATH \
+                   + " " + v[0] + " " + v[1] + " > " + file_path
+        # full_cmd = "ECHO Hello world " + str(idx) + " > " + file_path
+        subprocess.call(full_cmd, shell=True)
+        f = open(file_path, "r")
+        print()
+        print(f.read())
 
 
 def auto_label_main():

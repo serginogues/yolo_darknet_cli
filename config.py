@@ -4,6 +4,7 @@ Darknet shell main configuration parameters
 
 import glob
 import os
+import subprocess
 import shutil
 from random import randint
 from tqdm import tqdm
@@ -21,8 +22,9 @@ OPTIONS_LIST = ["AUTO-LABEL (semi-supervised learning)",  # 0
                 "CROP labeled images",  # 4
                 "COUNT label instances and images in Dataset",  # 5
                 "Image SIMILARITY in a Dataset",  # 6
-                "EXPORT images BY LABEL", # 7
-                "SAVE .weights every hour (while TRAIN)"]  # 8
+                "EXPORT images BY LABEL",  # 7
+                "SAVE .weights every hour (while TRAIN)",  # 8
+                "VALIDATE and COMPARE different models"]  # 9
 
 MODELS_LIST = ["Andenes", "Tornos", "OCR"]
 
