@@ -187,9 +187,8 @@ def auto_label_main():
 
     dataset_path = get_dataset(False)
     classes, num_classes = get_classes(dataset_path)
-    keyword = get_model()
-    cfg_path = get_cfg(num_classes, keyword)
-    weights_path = get_weights(keyword)
+    cfg_path = get_cfg(num_classes, "")
+    weights_path = get_weights("")
     copy_files_and_write_path(path_dataset=dataset_path,
                               path_to=DATA_OBJ_PATH,
                               path_write=os.path.join(DATA_PATH, 'train.txt'),
