@@ -157,7 +157,7 @@ def validate_and_compare():
                 counter += 1
                 # c_name = lines[i].split("name = ")[1].split(",")[0]
                 av_p = float(lines[i].split("ap = ")[1].split("%")[0])
-                class_ap[i].append(av_p)
+                class_ap[counter].append(av_p)
 
             if counter == num_classes:
                 break
