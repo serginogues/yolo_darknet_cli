@@ -138,9 +138,12 @@ def validate_and_compare():
         os.chdir(BASE_PATH)
         subprocess.call(full_cmd, shell=True)
         f = open(file_path, "r")
-        print()
-        print(f.read())
+        printed_results.append(f.read())
 
+    new_shell_section("Results")
+    for x in printed_results:
+        print(x)
+        print("\n")
 
 def auto_label_main():
     """
