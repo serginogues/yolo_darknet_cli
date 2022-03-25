@@ -79,9 +79,8 @@ def validate_main():
                               path_write=os.path.join(DATA_PATH, 'valid.txt'),
                               copy_labels=True)
     update_obj_data(classes, create_backup=False)
-    keyword = get_model()
-    cfg_path = get_cfg(num_classes, keyword)
-    weights_path = get_weights(keyword)
+    cfg_path = get_cfg(num_classes, "")
+    weights_path = get_weights("")
 
     full_cmd = "darknet.exe detector map " + OBJ_DATA_FILE_PATH \
                + " " + cfg_path + " " + weights_path
