@@ -151,15 +151,19 @@ def validate_and_compare():
         mAP_list.append(float(text.split("(mAP@0.50) = ")[1].split(",")[0]))
 
         lines = text.split("\n")
-        new_shell_section("LINES")
-        print(lines)
-        for i in range(num_classes):
-            c_name = lines[i].split("name = ")[1].split(",")[0]
-            av_p = float(lines[i].split("ap = ")[1].split("%")[0])
-            if c_name == classes[i]:
-                class_ap[i].append(av_p)
-            else:
-                raise Exception("Classes do not match")
+        counter = 0
+        for i in range(len(lines)):
+            if "class_id = " in lines[i]:
+                counter += 1
+                c_name = lines[i].split("name = ")[1].split(",")[0]
+                av_p = float(lines[i].split("ap = ")[1].split("%")[0])
+                if c_name == classes[i]:
+                    class_ap[i].append(av_p)
+                else:
+                    raise Exception("Classes do not match")
+
+            if counter == num_classes:
+                break
 
     df0 = {}
     for idx, c in enumerate(classes):
