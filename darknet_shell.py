@@ -135,6 +135,7 @@ def validate_and_compare():
         full_cmd = "darknet.exe detector map " + OBJ_DATA_FILE_PATH \
                    + " " + v[0] + " " + v[1] + " > " + file_path
         # full_cmd = "ECHO Hello world " + str(idx) + " > " + file_path
+        os.chdir(BASE_PATH)
         subprocess.call(full_cmd, shell=True)
         f = open(file_path, "r")
         print()
