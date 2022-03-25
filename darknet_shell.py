@@ -150,7 +150,7 @@ def validate_and_compare():
         f1_list.append(float(text.split("F1-score = ")[1].split("\n")[0]))
         mAP_list.append(float(text.split("(mAP@0.50) = ")[1].split(",")[0]))
 
-        lines = text.split("\n")
+        """lines = text.split("\n")
         counter = 0
         for i in range(len(lines)):
             if "class_id = " in lines[i] and "name = " in lines[i]:
@@ -160,15 +160,15 @@ def validate_and_compare():
                 counter += 1
 
             if counter == num_classes:
-                break
+                break"""
 
-    df0 = {}
+    """df0 = {}
     for idx, c in enumerate(classes):
         df0[c] = class_ap[idx]
     df = pd.DataFrame(df0, index=classes)
     ax = df.plot.bar(rot=0)
     ax.plot()
-    plt.show()
+    plt.show()"""
 
     df = pd.DataFrame({'precision': precision_list, 'recall': recall_list, 'f1': f1_list, 'mAP': mAP_list}, index=v_names)
     ax = df.plot.bar(rot=0)
