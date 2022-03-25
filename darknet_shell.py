@@ -155,12 +155,9 @@ def validate_and_compare():
         for i in range(len(lines)):
             if "class_id = " in lines[i]:
                 counter += 1
-                c_name = lines[i].split("name = ")[1].split(",")[0]
+                # c_name = lines[i].split("name = ")[1].split(",")[0]
                 av_p = float(lines[i].split("ap = ")[1].split("%")[0])
-                if c_name == classes[i]:
-                    class_ap[i].append(av_p)
-                else:
-                    raise Exception("Classes do not match")
+                class_ap[i].append(av_p)
 
             if counter == num_classes:
                 break
