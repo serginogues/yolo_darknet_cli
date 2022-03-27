@@ -148,10 +148,10 @@ def validate_and_compare():
 
         # Performance measures
         v_names.append(version_name)
-        precision_list.append(float(text.split("precision = ")[1].split(",")[0]))
-        recall_list.append(float(text.split("recall = ")[1].split(",")[0]))
-        f1_list.append(float(text.split("F1-score = ")[1].split("\n")[0]))
-        mAP_list.append(float(text.split("(mAP@0.50) = ")[1].split(",")[0]))
+        precision_list.append(np.round(float(text.split("precision = ")[1].split(",")[0])*100, 2))
+        recall_list.append(np.round(float(text.split("recall = ")[1].split(",")[0])*100, 2))
+        f1_list.append(np.round(float(text.split("F1-score = ")[1].split("\n")[0])*100, 2))
+        mAP_list.append(np.round(float(text.split("(mAP@0.50) = ")[1].split(",")[0])*100, 2))
 
         # Performance by class id
         df_by_class[version_name] = [np.round(float(l.split("ap = ")[1].split("%")[0]), 2) for l in text.split("\n") if "class_id = " in l and "name = " in l]
