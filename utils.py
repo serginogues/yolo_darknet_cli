@@ -374,5 +374,6 @@ def bar_plot_df(x_axis_categories: list, dataFrame):
     ax = df.plot.bar(rot=0)
     for container in ax.containers:
         ax.bar_label(container)
+    ax.set_ylim(0.6, 1)
     ax.plot()
 

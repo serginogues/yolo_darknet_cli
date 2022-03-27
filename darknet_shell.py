@@ -154,7 +154,7 @@ def validate_and_compare():
         mAP_list.append(float(text.split("(mAP@0.50) = ")[1].split(",")[0]))
 
         # Performance by class id
-        df_by_class[version_name] = [float(l.split("ap = ")[1].split("%")[0]) for l in text.split("\n") if "class_id = " in l and "name = " in l]
+        df_by_class[version_name] = [np.round(float(l.split("ap = ")[1].split("%")[0]), 2) for l in text.split("\n") if "class_id = " in l and "name = " in l]
 
     bar_plot_df(x_axis_categories=classes, dataFrame=df_by_class)
     bar_plot_df(x_axis_categories=v_names,
