@@ -159,6 +159,7 @@ def validate_and_compare():
     bar_plot_df(x_axis_categories=classes, dataFrame=df_by_class)
     bar_plot_df(x_axis_categories=v_names,
                 dataFrame={'precision': precision_list, 'recall': recall_list, 'f1': f1_list, 'mAP': mAP_list})
+    plt.show()
 
 
 def auto_label_main():
