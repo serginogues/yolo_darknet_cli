@@ -359,7 +359,7 @@ def new_shell_section(TITLE: str):
     print()
 
 
-def bar_plot_df(x_axis_categories: list, df):
+def bar_plot_df(x_axis_categories: list, df, AXES=0):
     """
     speed = [0.1, 17.5, 40]
     lifespan = [2, 8, 70]
@@ -370,12 +370,20 @@ def bar_plot_df(x_axis_categories: list, df):
 
     :param df: Example: {'model_1': [80, 15, 20], 'model_2': ...}
     """
-    y_min = np.min([x for ss in df.values() for x in ss]) - 10
-    y_max = np.max([x for ss in df.values() for x in ss]) + 10
+
+    if AXES == 1:
+        y_min = min([x for ss in df.values() for x in ss]) - 10
+        y_max = max([x for ss in df.values() for x in ss]) + 10
+    else:
+        mmean = np.mean([x for ss in df.values() for x in ss])
+        y_min = mmean - 20
+        y_max = mmean + 20
+
     if y_max > 100:
         y_max = 100
     if y_min < 0:
         y_min = 0
+
     df = pd.DataFrame(df,
                       index=x_axis_categories)
     ax = df.plot.bar(rot=0)
