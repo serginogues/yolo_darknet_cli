@@ -131,7 +131,7 @@ def validate_and_compare():
     f1_list = []
     mAP_list = []
     v_names = []
-    class_ap = [[]] * num_classes
+    df_by_class = {}
     for idx, v in enumerate(versions):
         cfg_name = get_file_name_from_path(os.path.splitext(v[0])[0])
         weights_name = get_file_name_from_path(os.path.splitext(v[1])[0])
@@ -144,36 +144,21 @@ def validate_and_compare():
         subprocess.call(full_cmd, shell=True)
         f = open(file_path, "r")
         text = f.read()
-        v_names.append(str(cfg_name + "_" + weights_name))
+        version_name = str(cfg_name + "_" + weights_name)
+
+        # Performance measures
+        v_names.append(version_name)
         precision_list.append(float(text.split("precision = ")[1].split(",")[0]))
         recall_list.append(float(text.split("recall = ")[1].split(",")[0]))
         f1_list.append(float(text.split("F1-score = ")[1].split("\n")[0]))
         mAP_list.append(float(text.split("(mAP@0.50) = ")[1].split(",")[0]))
 
-        """lines = text.split("\n")
-        counter = 0
-        for i in range(len(lines)):
-            if "class_id = " in lines[i] and "name = " in lines[i]:
-                # c_name = lines[i].split("name = ")[1].split(",")[0]
-                av_p = float(lines[i].split("ap = ")[1].split("%")[0])
-                class_ap[counter].append(av_p)
-                counter += 1
+        # Performance by class id
+        df_by_class[version_name] = [float(l.split("ap = ")[1].split("%")[0]) for l in text.split("\n") if "class_id = " in l and "name = " in l]
 
-            if counter == num_classes:
-                break"""
-
-    """df0 = {}
-    for idx, c in enumerate(classes):
-        df0[c] = class_ap[idx]
-    df = pd.DataFrame(df0, index=classes)
-    ax = df.plot.bar(rot=0)
-    ax.plot()
-    plt.show()"""
-
-    df = pd.DataFrame({'precision': precision_list, 'recall': recall_list, 'f1': f1_list, 'mAP': mAP_list}, index=v_names)
-    ax = df.plot.bar(rot=0)
-    ax.plot()
-    plt.show()
+    bar_plot_df(x_axis_categories=classes, dataFrame=df_by_class)
+    bar_plot_df(x_axis_categories=v_names,
+                dataFrame={'precision': precision_list, 'recall': recall_list, 'f1': f1_list, 'mAP': mAP_list})
 
 
 def auto_label_main():

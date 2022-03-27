@@ -356,3 +356,21 @@ def new_shell_section(TITLE: str):
     # os.system('cls' if os.name == 'nt' else 'clear')
     print("############### " + TITLE + " ################")
     print()
+
+
+def bar_plot_df(x_axis_categories: list, dataFrame):
+    """
+    speed = [0.1, 17.5, 40]
+    lifespan = [2, 8, 70]
+    x_axis_categories = ['snail', 'pig', 'elephant']
+    df = pd.DataFrame({'speed': speed,
+                       'lifespan': lifespan},
+                      index=x_axis_categories)
+
+    :param dataFrame: Example: {'model_1': [80, 15, 20], 'model_2': ...}
+    """
+    df = pd.DataFrame(dataFrame,
+                      index=x_axis_categories)
+    ax = df.plot.bar(rot=0)
+    ax.plot()
+    plt.show()
