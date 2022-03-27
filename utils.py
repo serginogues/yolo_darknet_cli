@@ -372,5 +372,7 @@ def bar_plot_df(x_axis_categories: list, dataFrame):
     df = pd.DataFrame(dataFrame,
                       index=x_axis_categories)
     ax = df.plot.bar(rot=0)
+    for container in ax.containers:
+        ax.bar_label(container)
     ax.plot()
-    plt.show()
+
