@@ -144,7 +144,7 @@ def validate_and_compare():
         subprocess.call(full_cmd, shell=True)
         f = open(file_path, "r")
         text = f.read()
-        version_name = str(cfg_name + "_" + weights_name)
+        version_name = str(weights_name)
 
         # Performance measures
         v_names.append(version_name)
