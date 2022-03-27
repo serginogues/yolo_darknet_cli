@@ -156,9 +156,9 @@ def validate_and_compare():
         # Performance by class id
         df_by_class[version_name] = [np.round(float(l.split("ap = ")[1].split("%")[0]), 2) for l in text.split("\n") if "class_id = " in l and "name = " in l]
 
-    bar_plot_df(x_axis_categories=classes, dataFrame=df_by_class)
+    bar_plot_df(x_axis_categories=classes, df=df_by_class)
     bar_plot_df(x_axis_categories=v_names,
-                dataFrame={'precision': precision_list, 'recall': recall_list, 'f1': f1_list, 'mAP': mAP_list})
+                df={'precision': precision_list, 'recall': recall_list, 'f1': f1_list, 'mAP': mAP_list})
     plt.show()
 
 

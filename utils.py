@@ -1,6 +1,7 @@
 """
 Generic small blocks that can be re-used
 """
+import pandas as pd
 
 from config import *
 
@@ -358,7 +359,7 @@ def new_shell_section(TITLE: str):
     print()
 
 
-def bar_plot_df(x_axis_categories: list, dataFrame):
+def bar_plot_df(x_axis_categories: list, df):
     """
     speed = [0.1, 17.5, 40]
     lifespan = [2, 8, 70]
@@ -367,13 +368,19 @@ def bar_plot_df(x_axis_categories: list, dataFrame):
                        'lifespan': lifespan},
                       index=x_axis_categories)
 
-    :param dataFrame: Example: {'model_1': [80, 15, 20], 'model_2': ...}
+    :param df: Example: {'model_1': [80, 15, 20], 'model_2': ...}
     """
-    df = pd.DataFrame(dataFrame,
+    y_min = np.min([x for ss in df.values() for x in ss]) - 10
+    y_max = np.max([x for ss in df.values() for x in ss]) + 10
+    if y_max > 100:
+        y_max = 100
+    if y_min < 0:
+        y_min = 0
+    df = pd.DataFrame(df,
                       index=x_axis_categories)
     ax = df.plot.bar(rot=0)
     for container in ax.containers:
         ax.bar_label(container)
-    ax.set_ylim(60, 99)
+    ax.set_ylim(y_min, y_max)
     ax.plot()
 
