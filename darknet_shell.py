@@ -1,6 +1,8 @@
 """
 MAINSCRIPT
 """
+import matplotlib.pyplot as plt
+
 from config import *
 from utils import *
 
@@ -319,6 +321,8 @@ def count_labels():
 
     total_images = 0
     total_instances = 0
+    df_camera = {}
+    df_station = {}
     for filename in tqdm(glob.glob(path + '*.txt', recursive=True), desc="Counting images"):
         labels_all = []
         total_images += 1
@@ -335,6 +339,19 @@ def count_labels():
         sorted_unique_labels = list(set(labels_all))
         for l in sorted_unique_labels:
             count_images[l] += 1
+
+        camera_name = get_file_name_from_path(filename).split("_")[0]
+        if camera_name != "classes.txt":
+            station_name = camera_name.split("-")[0]
+            if camera_name not in df_camera.keys():
+                df_camera[camera_name] = 1
+            else:
+                df_camera[camera_name] += 1
+            if station_name not in df_station.keys():
+                df_station[station_name] = 1
+            else:
+                df_station[station_name] += 1
+
     print(" class id - # instances - # images")
     for i in range(num_classes):
         print(classes[i] + " - " + str(count_instances[i]) + " - " + str(count_images[i]))
@@ -348,6 +365,10 @@ def count_labels():
         plt.pie(count_images, labels=classes, autopct='%1.1f%%', startangle=90)
         plt.title("Images per class (" + str(total_images) + ")")
         plt.axis('equal')
+        single_bar_plot_df(labels=[x for x in df_camera.keys()], values=[x for x in df_camera.values()])
+        plt.title("Images per camera")
+        single_bar_plot_df(labels=[x for x in df_station.keys()], values=[x for x in df_station.values()])
+        plt.title("Images per train station")
         plt.show()
 
 

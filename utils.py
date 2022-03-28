@@ -1,6 +1,7 @@
 """
 Generic small blocks that can be re-used
 """
+import matplotlib.pyplot as plt
 import pandas as pd
 
 from config import *
@@ -390,5 +391,17 @@ def bar_plot_df(x_axis_categories: list, df, AXES=0):
     for container in ax.containers:
         ax.bar_label(container)
     ax.set_ylim(y_min, y_max)
+    ax.plot()
+
+
+def single_bar_plot_df(labels: list, values: list):
+    """
+    """
+    df = pd.DataFrame({'value': values},
+                      index=labels)
+    ax = df.plot(kind="bar")
+    for container in ax.containers:
+        ax.bar_label(container)
+    # ax.set_ylim(0, max(values) + 5)
     ax.plot()
 
