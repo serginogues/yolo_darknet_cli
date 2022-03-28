@@ -387,7 +387,7 @@ def bar_plot_df(x_axis_categories: list, df, AXES=0):
 
     df = pd.DataFrame(df,
                       index=x_axis_categories)
-    ax = df.plot(kind="bar", alpha=0.5, width=0.7, edgecolor='black')
+    ax = df.plot(kind="bar", alpha=0.6, width=0.7, edgecolor='black')
     for container in ax.containers:
         ax.bar_label(container)
     ax.set_ylim(y_min, y_max)
@@ -399,7 +399,7 @@ def single_bar_plot_df(labels: list, values: list):
     """
     df = pd.DataFrame({'#': values},
                       index=labels)
-    ax = df.plot(kind="bar", alpha=0.5, width=1, edgecolor='black')
+    ax = df.plot(kind="bar", alpha=0.6, width=1, edgecolor='black')
     for container in ax.containers:
         ax.bar_label(container)
     # ax.set_ylim(0, max(values) + 5)
